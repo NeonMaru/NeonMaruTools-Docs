@@ -389,6 +389,44 @@
         .btn-link:active {
             transform: translateY(1px);
         }
+
+        /* MOBILE RESPONSIVE LAYOUT */
+        @media (max-width: 900px) {
+            body { 
+                flex-direction: column; 
+            }
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0; left: 0;
+                height: auto;
+                max-height: none;
+                border-radius: 0 0 24px 24px;
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+            section.panel {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            div[style*="display: flex; gap: 20px"] {
+                flex-direction: column !important;
+            }
+            div[style*="flex: 0 0 65%"] {
+                flex: none !important;
+                width: 100% !important;
+            }
+            ul[style*="flex: 1"] {
+                flex: none !important;
+                width: 100% !important;
+                margin-top: 15px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -891,187 +929,6 @@
             }
         });
     </script>
-    <!-- DEV PANEL FOR TIMESTAMPS -->
-    <div id="dev-panel" style="position: fixed; right: 20px; top: 20px; width: 300px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--accent); border-radius: 10px; padding: 15px; z-index: 9999; backdrop-filter: blur(10px); color: white; max-height: 90vh; overflow-y: auto;">
-        <h3 style="margin-top: 0; color: var(--accent); font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Timestamp Editor</h3>
-        <div id="dev-panel-content"></div>
-        <button id="dev-panel-copy" style="width: 100%; margin-top: 15px; background: var(--accent); color: black; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">Copy Config for Anya</button>
-    </div>
-    <script>
-        // Build Dev Panel
-        const devPanelContent = document.getElementById('dev-panel-content');
-        const allTimestamps = document.querySelectorAll('.interactive-timestamps li');
-        
-        // Add Sync Toggle
-        const syncWrapper = document.createElement('div');
-        syncWrapper.style.marginBottom = '15px';
-        syncWrapper.style.paddingBottom = '10px';
-        syncWrapper.style.borderBottom = '1px solid #333';
-        syncWrapper.style.display = 'flex';
-        syncWrapper.style.alignItems = 'center';
-        
-        const syncCheckbox = document.createElement('input');
-        syncCheckbox.type = 'checkbox';
-        syncCheckbox.id = 'sync-jp-en';
-        syncCheckbox.checked = true;
-        syncCheckbox.style.marginRight = '8px';
-        
-        const syncLabel = document.createElement('label');
-        syncLabel.htmlFor = 'sync-jp-en';
-        syncLabel.innerText = 'Sync JP timestamps with EN';
-        syncLabel.style.fontSize = '12px';
-        syncLabel.style.color = '#aaa';
-        syncLabel.style.cursor = 'pointer';
-        
-        syncWrapper.appendChild(syncCheckbox);
-        syncWrapper.appendChild(syncLabel);
-        devPanelContent.appendChild(syncWrapper);
-        
-        // Build grouped inputs
-        const panelGroups = {};
-        const inputElements = []; // Store references to sync later
-        
-        allTimestamps.forEach((li, index) => {
-            const textLabel = li.innerText.split(':')[0].substring(0, 20);
-            const panel = li.closest('.panel');
-            const parentId = panel.id;
-            
-            if (!panelGroups[parentId]) {
-                const groupContainer = document.createElement('div');
-                groupContainer.className = 'dev-panel-group';
-                groupContainer.id = 'dev-group-' + parentId;
-                groupContainer.style.display = 'none'; // Hidden by default
-                
-                const sectionHeader = document.createElement('div');
-                sectionHeader.innerText = parentId;
-                sectionHeader.style.color = '#888';
-                sectionHeader.style.fontSize = '10px';
-                sectionHeader.style.marginTop = '10px';
-                sectionHeader.style.marginBottom = '5px';
-                sectionHeader.style.textTransform = 'uppercase';
-                
-                groupContainer.appendChild(sectionHeader);
-                devPanelContent.appendChild(groupContainer);
-                panelGroups[parentId] = groupContainer;
-            }
-            
-            const wrapper = document.createElement('div');
-            wrapper.style.marginBottom = '10px';
-            wrapper.style.display = 'flex';
-            wrapper.style.justifyContent = 'space-between';
-            wrapper.style.alignItems = 'center';
-            
-            const label = document.createElement('span');
-            label.innerText = textLabel;
-            label.style.fontSize = '12px';
-            label.style.opacity = '0.8';
-            label.style.whiteSpace = 'nowrap';
-            label.style.overflow = 'hidden';
-            label.style.textOverflow = 'ellipsis';
-            label.style.maxWidth = '180px';
-            
-            const input = document.createElement('input');
-            input.type = 'text'; // Changed to text to allow typing 'ignore'
-            input.value = li.getAttribute('data-time') || '';
-            input.style.width = '60px';
-            input.style.background = '#222';
-            input.style.border = '1px solid #444';
-            input.style.color = 'var(--accent)';
-            input.style.borderRadius = '3px';
-            input.style.padding = '3px';
-            
-            // Store reference for syncing
-            const isJp = parentId.endsWith('-jp');
-            const baseId = isJp ? parentId.replace('-jp', '') : parentId;
-            const elementData = { li, input, isJp, baseId, indexInList: -1 };
-            inputElements.push(elementData);
-            
-            // We need to know which index this is within its panel to sync correctly
-            elementData.indexInList = Array.from(panel.querySelectorAll('.interactive-timestamps li')).indexOf(li);
-            
-            input.addEventListener('input', (e) => {
-                const val = e.target.value.trim().toLowerCase();
-                
-                if (val === 'ignore' || val === '') {
-                    li.removeAttribute('data-time');
-                    li.style.opacity = '0.4';
-                    li.style.cursor = 'default';
-                } else {
-                    li.setAttribute('data-time', val);
-                    li.style.opacity = '1';
-                    li.style.cursor = 'crosshair';
-                }
-                
-                // Seek video
-                const parsedVal = parseFloat(val);
-                if (panel && !isNaN(parsedVal)) {
-                    const video = panel.querySelector('video');
-                    if (video) video.currentTime = parsedVal;
-                }
-                
-                // Sync logic
-                if (syncCheckbox.checked && !isJp) {
-                    // Find the corresponding JP input
-                    const jpSibling = inputElements.find(el => el.isJp && el.baseId === baseId && el.indexInList === elementData.indexInList);
-                    if (jpSibling) {
-                        jpSibling.input.value = e.target.value; // Use original exact input text
-                        if (val === 'ignore' || val === '') {
-                            jpSibling.li.removeAttribute('data-time');
-                            jpSibling.li.style.opacity = '0.4';
-                            jpSibling.li.cursor = 'default';
-                        } else {
-                            jpSibling.li.setAttribute('data-time', val);
-                            jpSibling.li.style.opacity = '1';
-                            jpSibling.li.cursor = 'crosshair';
-                        }
-                    }
-                }
-            });
-            
-            wrapper.appendChild(label);
-            wrapper.appendChild(input);
-            panelGroups[parentId].appendChild(wrapper);
-        });
-
-        // Intersection Observer to show/hide dev panel groups based on scroll
-        const panelObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const devGroupId = 'dev-group-' + entry.target.id;
-                const groupEl = document.getElementById(devGroupId);
-                if (groupEl) {
-                    if (entry.isIntersecting) {
-                        groupEl.style.display = 'block';
-                    } else {
-                        groupEl.style.display = 'none';
-                    }
-                }
-                
-                // Highlight the sidebar link for the active panel
-                if (entry.isIntersecting) {
-                    const baseId = entry.target.id.replace('-jp', '');
-                    const activeLink = document.querySelector(`.nav-links a[href="#${baseId}"]`);
-                    if (activeLink) {
-                        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-                        activeLink.classList.add('active');
-                    }
-                }
-            });
-        }, { threshold: 0.2 });
-        
-        document.querySelectorAll('.panel').forEach(panel => {
-            panelObserver.observe(panel);
-        });
-
-        document.getElementById('dev-panel-copy').addEventListener('click', () => {
-            let config = {};
-            allTimestamps.forEach((li) => {
-                const id = li.closest('.panel').id;
-                if (!config[id]) config[id] = {};
-                config[id][li.innerText.split(':')[0]] = li.getAttribute('data-time');
-            });
-            navigator.clipboard.writeText(JSON.stringify(config, null, 2));
-            alert('Copied to clipboard! Just paste it to Anya.');
-        });
-    </script>
+    <!-- DEV PANEL REMOVED FOR PRODUCTION -->
 </body>
 </html>
