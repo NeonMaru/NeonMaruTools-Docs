@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeonMaruTools | Beta Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #060810;
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff0055;
+            --neon-purple: #9d00ff;
+            --surface-color: rgba(20, 25, 40, 0.35);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        /* Ambient Cosmic Background Lighting */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -2;
+            background-image: 
+                radial-gradient(circle at 15% 30%, rgba(157, 0, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(255, 0, 85, 0.1) 0%, transparent 50%);
+        }
+
+        /* Animated Glowing Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(0, 240, 255, 0.2);
+            top: -50px; left: -100px;
+            animation: float1 15s infinite alternate ease-in-out;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: rgba(255, 0, 85, 0.15);
+            bottom: -100px; right: -150px;
+            animation: float2 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes float1 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100px, -50px); }
+        }
+
+        /* SIDEBAR (Liquid Glass) */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - 40px);
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--surface-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(0, 240, 255, 0.05);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1.5px;
+            background: linear-gradient(135deg, rgba(0,240,255,0.4), rgba(255,255,255,0.05) 50%, rgba(255,0,85,0.2));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, #fff, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0,240,255,0.3);
+        }
+
+        /* Active Language Switch */
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: rgba(0,0,0,0.5);
+            padding: 0.4rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .lang-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--neon-cyan), #00a2ff);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-links::-webkit-scrollbar { width: 4px; }
+        .nav-links::-webkit-scrollbar-track { background: transparent; }
+        .nav-links::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 10px; }
+
+        .nav-links li { margin-bottom: 0.5rem; }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .nav-links a.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-cyan);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.1);
+            text-shadow: 0 0 10px rgba(0,240,255,0.5);
+        }
+
+        .nav-links .sub-link {
+            padding-left: 2.5rem;
+            font-size: 0.85rem;
+            margin-top: -0.2rem;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: calc(var(--sidebar-width) + 40px);
+            flex-grow: 1;
+            padding: 2rem 4rem 4rem 0;
+            max-width: 1100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .content-block { display: none; }
+        .content-block.active { display: block; animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); filter: blur(10px); } 
+            to { opacity: 1; transform: translateY(0); filter: blur(0); } 
+        }
+
+        /* LIQUID GLASS PANELS */
+        section.panel {
+            background: linear-gradient(145deg, rgba(30, 35, 50, 0.4) 0%, rgba(10, 12, 20, 0.2) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.6),
+                inset 0 0 30px rgba(0, 240, 255, 0.03);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            scroll-margin-top: 2rem;
+        }
+        
+        section.panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            padding: 1.5px;
+            background: linear-gradient(135deg, rgba(0,240,255,0.6), rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, rgba(255,0,85,0.4));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        section.panel:hover {
+            transform: translateY(-5px);
+        }
+        
+        section.panel:hover::before {
+            background: linear-gradient(135deg, rgba(0,240,255,0.8), rgba(255,255,255,0.1) 30%, rgba(255,255,255,0.1) 70%, rgba(255,0,85,0.8));
+            box-shadow: 0 0 20px rgba(0,240,255,0.5);
+        }
+
+        .section-group-title {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-group-title h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        section.panel h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .step-icon {
+            background: transparent;
+            color: var(--neon-cyan);
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 
+                0 0 15px rgba(0, 240, 255, 0.3),
+                inset 0 0 10px rgba(0, 240, 255, 0.2);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        section.panel h3 {
+            font-size: 1.6rem;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        section.panel h3::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 24px;
+            background: var(--neon-pink);
+            border-radius: 4px;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        p, li { font-size: 1.05rem; color: #cbd5e1; font-weight: 300; }
+        strong { font-weight: 600; color: #ffffff; }
+
+        /* LIQUID VIDEO CONTAINER */
+        .video-container {
+            width: 100%;
+            border-radius: 16px;
+            margin: 2.5rem 0;
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.5), rgba(255, 0, 85, 0.3));
+            padding: 1.5px; /* Creates the glowing gradient border effect */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        video {
+            width: 100%;
+            display: block;
+            outline: none;
+            border-radius: 15px; /* Slightly less to fit inside padding */
+            background: #000;
+        }
+
+        video::-webkit-media-controls {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        video:hover::-webkit-media-controls {
+            opacity: 1;
+        }
+
+        /* LIQUID BUTTONS */
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 240, 255, 0.05);
+            color: #fff;
+            text-decoration: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            box-shadow: 
+                0 0 15px rgba(0, 240, 255, 0.15),
+                inset 0 0 10px rgba(0, 240, 255, 0.1);
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-link:hover {
+            transform: translateY(-2px);
+            background: rgba(0, 240, 255, 0.2);
+            border-color: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 
+                0 0 25px rgba(0, 240, 255, 0.4),
+                inset 0 0 15px rgba(0, 240, 255, 0.3);
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+        
+        .btn-link:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>NeonMaruTools</h1>
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Beta Documentation</div>
+        </div>
+
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="switchLang('en')">English</button>
+            <button class="lang-btn" onclick="switchLang('jp')">日本語</button>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="#intro">1. Introduction</a></li>
+            <li><a href="#settings">2. Settings Overview</a></li>
+            <li><a href="#general" class="sub-link">2a. General Settings</a></li>
+            <li><a href="#connection" class="sub-link">2b. Connection Options</a></li>
+            <li><a href="#subarm" class="sub-link">2c. Sub-Armatures</a></li>
+            <li><a href="#temp-group">3. Workflow Tools</a></li>
+            <li><a href="#temp-group" class="sub-link">3a. Temporary Bone Group Viewer</a></li>
+            <li><a href="#improved-hierarchy" class="sub-link">3b. Improved Hierarchy</a></li>
+            <li><a href="#pb-usage">4. Using with Physbones</a></li>
+            <li><a href="#pb-usage" class="sub-link">4a. Physbone Usage</a></li>
+            <li><a href="#showcase" class="sub-link">4b. Quickly locate Physbone Scripts</a></li>
+            <li><a href="#focus-hierarchy" class="sub-link">4c. Focus from Hierachy to Viewport</a></li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+        <!-- ================= ENGLISH ================= -->
+        <div id="content-en" class="content-block active">
+            
+            <section id="intro" class="panel">
+                <h2><span class="step-icon">1</span> Introduction</h2>
+                <p>NeonMaruTools is a collection of Quality of Life tools that is designed to solve unity's biggest bottleneck : The Way users navigate with the Viewport and the ease of accessing bones visually and quickly. Using my experience as a blender artist, i've always liked the way you could interact with any object just by pressing hotkeys and moving the mouse to where you want it to go, without needing to drag manipulators, saving tons of time while being really intuitive. With this, i'm creating a set of tools that will bring that seamless experience into Unity.</p>
+                <p>This website contains information on how to effectively use NeonMaruTools. Please refer to the video tutorials as they are pretty self explanatory.</p>
+                <p><strong>Requirements:</strong> Unity 2022.3.22f1 (or newer) & VRChat SDK.</p>
+                
+                <div>
+                    <a href="#" class="btn-link">Discord Server</a>
+                    <a href="#" class="btn-link">BOOTH Store</a>
+                </div>
+
+                <h3>Quickstart</h3>
+                <div class="video-container">
+                    <video src="assets/GetStart1.mp4" controls loop muted playsinline></video>
+                </div>
+            </section>
+
+            <!-- Section 2 Group Title -->
+            <div class="section-group-title" id="settings">
+                <h2>Settings Introduction</h2>
+            </div>
+
+            <section id="general" class="panel">
+                <h3>2a. General Settings Rundown</h3>
+                <p>The General Settings tab gives you complete control over what information is shown in your viewport. You can toggle the entire tool on/off, hide non-essential bones to declutter your hierarchy, and configure how visual guides are drawn.</p>
+                
+                <div class="video-container">
+                    <video src="assets/Settings1.mp4" controls loop muted playsinline></video>
+                </div>
+                
+                <h3>Setting Breakdown</h3>
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Enable Visualizer:</strong> Toggles the entire overlay visualizer on or off in the Scene View.</li>
+                    <li data-time="1"><strong>Visibility > Show Action History Window:</strong> Displays an on-screen log of recently clicked or modified bones for quick undo/re-selection.</li>
+                    <li data-time="4.5"><strong>Visibility > Hide 0,0,0 Container Bones:</strong> Automatically hides empty parent container bones (bones with zero transform values) to declutter the hierarchy view.</li>
+                    <li data-time="12"><strong>Visibility > Show Hover Tooltips:</strong> Enables detailed tooltips when hovering over bones in the Scene View.</li>
+                    <li data-time="20"><strong>Visual Guides > Armature Guide Lines:</strong> Draws connection lines between bones to visualize the full skeleton structure even through meshes.</li>
+                    <li data-time="26"><strong>Visual Guides > Action History Lines:</strong> Draws visual trails indicating recent bone movement or rotation paths.</li>
+                    <li><strong>Controls > Override F-Key (Focus):</strong> Overrides Unity's default Focus (F) behavior to seamlessly center the camera on the selected bone without losing the overlay context.</li>
+                    <li><strong>Controls > Transform Hotkeys:</strong> Switch between default Unity manipulation hotkeys or Blender-style hotkeys (G to grab, R to rotate, S to scale) for faster posing.</li>
+                    <li><strong>Controls > Enable RMB Pivot Snap:</strong> Allows you to instantly snap the pivot point to any bone by right-clicking it in the Scene View.</li>
+                </ul>
+            </section>
+
+            <section id="connection" class="panel">
+                <h3>2b. Connection Options</h3>
+                <p>The Connection Options tab lets you customize how the bones are visually connected and rendered. You can adjust the render style, thickness, and joint sizes to your exact preference.</p>
+                
+                <div class="video-container">
+                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline></video>
+                </div>
+                
+                <ul class="interactive-timestamps">
+                    <li data-time="0"><strong>Multi Child Type:</strong> Determines how connection lines are drawn when a bone has multiple children. (e.g. Ignore, Average, Center).</li>
+                    <li data-time="5"><strong>Render Style:</strong> Choose the visual style for the bones, such as Wireframe Octahedron, Solid, or simple Lines.</li>
+                    <li data-time="14.0"><strong>Bone Thickness:</strong> Adjusts the overall girth/thickness of the drawn bones.</li>
+                    <li data-time="16.5"><strong>Joint Size:</strong> Modifies the radius of the spherical joints at each bone's pivot point.</li>
+                    <li data-time="20"><strong>Manipulator Size:</strong> Changes the size of the interactive transform gizmo when a bone is selected.</li>
+                    <li data-time="23"><strong>Camera Framing > Min/Max Zoom Distance:</strong> Sets the limits for how close or far the camera will zoom when focusing on a bone using the F-key.</li>
+                </ul>
+            </section>
+
+            <section id="subarm" class="panel">
+                <h3>2c. Sub-Armatures</h3>
+                <p>This section allows you to customize how different sub-armature systems are color-coded in your hierarchy. You can independently set the Shaded and Wireframe colors for the Core Armature, Custom, PhysB, and Auto-detected bone groups.</p>
+                
+                <div class="video-container">
+                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Core Armature:</strong> Modifies the visual color for the main Humanoid rig (or manually mapped core bones).</li>
+                    <li data-time="2.0"><strong>Custom:</strong> Modifies the visual color for user-assigned custom bones.</li>
+                    <li data-time="8"><strong>PhysB:</strong> Modifies the visual color for all PhysBones and their child chains.</li>
+                    <li data-time="52"><strong>Auto:</strong> Modifies the visual color for all other automatically detected bones.</li>
+                </ul>
+            </section>
+
+            <!-- Section 3 Group Title -->
+            <div class="section-group-title" id="workflow">
+                <h2>3. Workflow Tools</h2>
+            </div>
+
+            <section id="temp-group" class="panel">
+                <h3>3a. Temporary Bone Group Viewer</h3>
+                <p>This section explains how to manually assign specific bones to a "Custom" group for easy access. You can add or remove bones and view them together under the Custom Group Display.</p>
+                
+                <div class="video-container">
+                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Add Bone Group:</strong> Add a temporary bone group</li>
+                    <li><strong>Remove Bone Group:</strong> Remove temporary bone group</li>
+                    <li data-time="17"><strong>Renaming Bone Group:</strong> Rename your custom bone groups for better organization</li>
+                    <li data-time="39"><strong>Toggling Bone Group:</strong> Choose what groups to toggle on / off to conveniently hide groups</li>
+                    <li data-time="76"><strong>Quick Drag On/Off Groups:</strong> Quickly turn off multiple bone groups by holding Left Mouse button and dragging on the <span style="color: var(--neon-cyan); font-weight: bold;">✓</span> list</li>
+                </ul>
+            </section>
+
+            <section id="improved-hierarchy" class="panel">
+                <h3>3b. Improved Hierarchy & Bone Navigation</h3>
+                <p>This section gives you an example of how you can use the Temporary Bone Group for your projects, and a brief introduction to the improved GameObject Hierarchy.</p>
+                <p><em>Please pay attention to the hotkeys being pressed on the bottom left corner of the screen.</em></p>
+                
+                <div class="video-container">
+                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="10"><strong>Find my Bone Group ?:</strong> When you hover your mouse over a Bone Group, it will indicate exactly which parent is controlling the child bone object by drawing a white line towards the source.</li>
+                    <li data-time="0.0"><strong>F-key press on scene viewport:</strong> Press the F key when you are hovered on scene to find the specific bone in the hierarchy.</li>
+                    <li data-time="32"><strong>F-key press x1 on ArmatureSetting Window:</strong> Focuses your window to the bone group in the scene.</li>
+                    <li data-time="8"><strong>F-key press x2 on ArmatureSetting Window:</strong> Press F-key x2 when on the window to locate the bone group in the hierarchy.</li>
+                </ul>
+            </section>
+
+            <section id="pb-usage" class="panel">
+                <h2><span class="step-icon">4</span> Using with Physbones</h2>
+                <h3>4a. Physbone Usage</h3>
+                <p>An overview of Physbone usage within the Armature Visualizer.</p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-timestamps" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-time="0.0"><strong>Physbone Group highlight:</strong> Quickly hover mouse over the panel to see a visual highlight of your bone groups</li>
+                        <li data-time="11"><strong>Select Physbone Group:</strong> press F x1 while hovered on the panel to select the physbone group</li>
+                        <li data-time="20"><strong>Focus Physbone Group:</strong> press F x2 while hovered over a bone group in the panel to focus your viewport to the entire physbone group. The script will automatically set the optimal viewport position based on your settings (see <a href="#connection" style="color: var(--neon-cyan); text-decoration: none;">2b. Connection Options</a> category)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="showcase" class="panel">
+                <h3>4b. Quickly locate Physbone Scripts</h3>
+                <p>No matter how complicated your Physbone structure is, this tool helps you find what you are looking for within a few seconds, please observe the hierarchy.</p>
+                
+                <div class="video-container">
+                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="3"><strong>Where is my Wings Physbones Located?:</strong> Here it is!</li>
+                    <li data-time="18"><strong>What about the complicated hair?:</strong> Despite being nested in different parents, you can find exactly the physbone you are looking for within seconds.</li>
+                    <li data-time="25"><strong>Hierarchy Finder:</strong> The script renders a blue visual line directly on the hierarchy to exactly where the physbone script is located, no matter how many child objects there are.</li>
+                </ul>
+            </section>
+
+            <section id="focus-hierarchy" class="panel">
+                <h3>4c. Focus from Hierachy to Viewport</h3>
+                <p>We've added an additional function to find bones from Hierachy ---> Viewport. This feature syncs with the ArmatureSetting panel to tell you exactly which bone group it's part of.</p>
+                
+                <div class="video-container">
+                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0"><strong>F key on hierachy:</strong> Press F-key while in the hierachy to "focus" on the singular bone (you will need to left-click on the bone first)</li>
+                    <li data-time="23"><strong>ArmatureSetting panel Sync:</strong> The ArmatureSetting panel will automatically sync and visually identify which bone group your selected bone belongs to. This allows you to quickly navigate and fix problems without needing to guess where the physbone parent is, even if it's nested in another hierachy structure.</li>
+                </ul>
+            </section>
+
+        </div>
+
+        <!-- ================= JAPANESE ================= -->
+        <div id="content-jp" class="content-block">
+            
+            <section id="intro-jp" class="panel">
+                <h2><span class="step-icon">1</span> はじめに</h2>
+                <p>NeonMaruToolsのクローズドベータへようこそ！このツールは、アーマチュアのオーバーレイ表示と素早い階層選択を提供することで、アバター改変のワークフローを高速化するように設計されています。</p>
+                <p><strong>動作環境:</strong> Unity 2022.3.22f1 (またはそれ以降) & VRChat SDK.</p>
+                
+                <div>
+                    <a href="#" class="btn-link">Discord サーバー</a>
+                    <a href="#" class="btn-link">BOOTH ストア</a>
+                </div>
+            </section>
+
+            <!-- Section 2 Group Title -->
+            <div class="section-group-title" id="settings-jp">
+                <h2>設定の紹介</h2>
+            </div>
+
+            <section id="general-jp" class="panel">
+                <h3>2a. 一般設定の概要</h3>
+                <p>一般設定タブでは、ビューポートに表示される情報を完全に制御できます。ツール全体のオン/オフを切り替えたり、不要なボーンを非表示にして階層を整理したり、視覚ガイドの描画方法を設定したりできます。</p>
+                
+                <div class="video-container">
+                    <video src="assets/Settings1.mp4" controls loop muted playsinline></video>
+                </div>
+                
+                <h3>設定の詳細</h3>
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Enable Visualizer:</strong> シーンビューでのオーバーレイビジュアライザー全体のオン/オフを切り替えます。</li>
+                    <li data-time="1"><strong>Visibility > Show Action History Window:</strong> 最近クリックまたは変更されたボーンのオンスクリーンログを表示し、素早い元に戻す/再選択を可能にします。</li>
+                    <li data-time="4.5"><strong>Visibility > Hide 0,0,0 Container Bones:</strong> 階層ビューを整理するために、空の親コンテナボーン（トランスフォーム値がゼロのボーン）を自動的に非表示にします。</li>
+                    <li data-time="12"><strong>Visibility > Show Hover Tooltips:</strong> シーンビューでボーンの上にマウスを置いたときに詳細なツールチップを表示します。</li>
+                    <li data-time="20"><strong>Visual Guides > Armature Guide Lines:</strong> メッシュを通してでも完全なスケルトン構造を視覚化するために、ボーン間に接続線を描画します。</li>
+                    <li data-time="26"><strong>Visual Guides > Action History Lines:</strong> 最近のボーンの移動や回転パスを示す視覚的なトレイルを描画します。</li>
+                    <li><strong>Controls > Override F-Key (Focus):</strong> オーバーレイのコンテキストを失うことなく、選択したボーンにカメラをシームレスに中央に配置するために、Unityのデフォルトのフォーカス(F)の動作をオーバーライドします。</li>
+                    <li><strong>Controls > Transform Hotkeys:</strong> より高速なポージングのために、デフォルトのUnityの操作ホットキーまたはBlenderスタイルのホットキー（Gで移動、Rで回転、Sでスケール）を切り替えます。</li>
+                    <li><strong>Controls > Enable RMB Pivot Snap:</strong> シーンビューでボーンを右クリックすることで、ピボットポイントを任意のボーンに即座にスナップできるようにします。</li>
+                </ul>
+            </section>
+
+            <section id="connection-jp" class="panel">
+                <h3>2b. 接続オプション (Connection Options)</h3>
+                <p>接続オプションタブでは、ボーンが視覚的にどのように接続され、レンダリングされるかをカスタマイズできます。レンダリングスタイル、太さ、ジョイントのサイズを好みに合わせて調整できます。</p>
+                
+                <div class="video-container">
+                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline></video>
+                </div>
+                
+                <ul class="interactive-timestamps">
+                    <li data-time="0"><strong>Multi Child Type:</strong> ボーンに複数の子がある場合の接続線の描画方法を決定します（例: Ignore, Average, Center）。</li>
+                    <li data-time="5"><strong>Render Style:</strong> ボーンの視覚スタイル（Wireframe Octahedron、Solid、または単純なLinesなど）を選択します。</li>
+                    <li data-time="14.0"><strong>Bone Thickness:</strong> 描画されるボーン全体の太さを調整します。</li>
+                    <li data-time="16.5"><strong>Joint Size:</strong> 各ボーンのピボットポイントにある球形ジョイントの半径を変更します。</li>
+                    <li data-time="20"><strong>Manipulator Size:</strong> ボーン選択時のインタラクティブなトランスフォームギズモのサイズを変更します。</li>
+                    <li data-time="23"><strong>Camera Framing > Min/Max Zoom Distance:</strong> Fキーを使用してボーンにフォーカスする際の、カメラのズームの近さ/遠さの制限を設定します。</li>
+                </ul>
+            </section>
+
+            <section id="subarm-jp" class="panel">
+                <h3>2c. サブアーマチュア (Sub-Armatures)</h3>
+                <p>ここでは、異なるサブアーマチュアシステムが階層内でどのように色分けされるかをカスタマイズできます。Core Armature、Custom、PhysB、および自動検出グループのShaded色とWireframe色を個別に設定できます。</p>
+                
+                <div class="video-container">
+                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Core Armature:</strong> メインのHumanoidリグ（または手動でマッピングされたコアボーン）の視覚色を変更します。</li>
+                    <li data-time="2.0"><strong>Custom:</strong> ユーザーが割り当てたカスタムボーンの視覚色を変更します。</li>
+                    <li data-time="8"><strong>PhysB:</strong> すべてのPhysBoneとその子チェーンの視覚色を変更します。</li>
+                    <li data-time="52"><strong>Auto:</strong> その他の自動検出されたすべてのボーンの視覚色を変更します。</li>
+                </ul>
+            </section>
+
+            <!-- Section 3 Group Title -->
+            <div class="section-group-title" id="workflow-jp">
+                <h2>3. ワークフローツール</h2>
+            </div>
+
+            <section id="temp-group-jp" class="panel">
+                <h3>3a. 一時的ボーングループビューア (Temporary Bone Group Viewer)</h3>
+                <p>このセクションでは、特定のボーンを手動で「Custom」グループに割り当てて簡単にアクセスできるようにする方法を説明します。Custom Group Display（カスタムグループ表示）でボーンを追加、削除、一括表示できます。</p>
+                
+                <div class="video-container">
+                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0.0"><strong>Add Bone Group:</strong> 一時的なボーングループを追加します。</li>
+                    <li><strong>Remove Bone Group:</strong> 一時的なボーングループを削除します。</li>
+                    <li data-time="17"><strong>Renaming Bone Group:</strong> カスタムボーングループの名前を変更して整理しやすくします。</li>
+                    <li data-time="39"><strong>Toggling Bone Group:</strong> グループのオン/オフを切り替えて、特定のグループを非表示にします。</li>
+                    <li data-time="76"><strong>Quick Drag On/Off Groups:</strong> リストの「<span style="color: var(--neon-cyan); font-weight: bold;">✓</span>」を左クリックしながらドラッグすることで、複数のボーングループのオン/オフをすばやく切り替えます。</li>
+                </ul>
+            </section>
+
+            <section id="improved-hierarchy-jp" class="panel">
+                <h3>3b. 改善された階層構造とナビゲーション (Improved Hierarchy & Navigation)</h3>
+                <p>このセクションでは、プロジェクトで一時的ボーングループ（Temporary Bone Group）を使用する例と、改良されたGameObject階層（Hierarchy）について簡単に紹介します。</p>
+                <p><em>画面左下に表示されるホットキーの入力に注意してください。</em></p>
+                
+                <div class="video-container">
+                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="10"><strong>Find my Bone Group ?:</strong> ボーングループにマウスを合わせると、白い線が描画され、どの子ボーンがどの親によって制御されているかが正確に示されます。</li>
+                    <li data-time="0.0"><strong>F-key press on scene viewport:</strong> シーン上でマウスをホバーしているときに F キーを押すと、階層（Hierarchy）内の特定のボーンを見つけることができます。</li>
+                    <li data-time="32"><strong>F-key press x1 on ArmatureSetting Window:</strong> 1回 F キーを押すと、シーン内のボーングループにウィンドウのフォーカスを合わせます。</li>
+                    <li data-time="8"><strong>F-key press x2 on ArmatureSetting Window:</strong> ウィンドウ上で F キーを2回押すと、階層（Hierarchy）内のボーングループを見つけます。</li>
+                </ul>
+            </section>
+
+            <section id="pb-usage-jp" class="panel">
+                <h2><span class="step-icon">4</span> PhysBoneとの併用 (Using with Physbones)</h2>
+                <h3>4a. PhysBoneの使用方法 (Physbone Usage)</h3>
+                <p>Armature Visualizer内でのPhysBoneの使い方の概要です。</p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-timestamps" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-time="0.0"><strong>Physbone Group highlight:</strong> パネル上にマウスを素早く合わせると、ボーングループが視覚的にハイライト表示されます。</li>
+                        <li data-time="11"><strong>Select Physbone Group:</strong> パネル上にマウスを合わせた状態で F キーを1回押すと、PhysBoneグループを選択します。</li>
+                        <li data-time="20"><strong>Focus Physbone Group:</strong> パネルのボーングループ上にマウスを合わせた状態で F キーを2回押すと、ビューポートの焦点がPhysBoneグループ全体に合います。スクリプトは設定に基づいて最適なビューポート位置を自動的に設定します（<a href="#connection-jp" style="color: var(--neon-cyan); text-decoration: none;">2b. Connection Options</a> カテゴリを参照）。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="showcase-jp" class="panel">
+                <h3>4b. PhysBoneスクリプトの迅速な特定 (Quickly locate Physbone Scripts)</h3>
+                <p>PhysBoneの構造がどれほど複雑であっても、このツールを使えば数秒で探しているものを見つけることができます。階層（Hierarchy）を観察してください。</p>
+                
+                <div class="video-container">
+                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="3"><strong>Where is my Wings Physbones Located?:</strong> ここにあります！</li>
+                    <li data-time="18"><strong>What about the complicated hair?:</strong> 異なる親にネストされていても、探しているPhysBoneを数秒で正確に見つけることができます。</li>
+                    <li data-time="25"><strong>Hierarchy Finder:</strong> 子オブジェクトがいくつあっても、スクリプトは階層（Hierarchy）上でPhysBoneスクリプトが配置されている正確な場所に青い視覚的な線を描画します。</li>
+                </ul>
+            </section>
+
+            <section id="focus-hierarchy-jp" class="panel">
+                <h3>4c. 階層からビューポートへのフォーカス (Focus from Hierachy to Viewport)</h3>
+                <p>階層（Hierarchy）からビューポートへボーンを見つける機能を追加しました。この機能はArmatureSettingパネルと同期し、どのボーングループに属しているかを正確に教えてくれます。</p>
+                
+                <div class="video-container">
+                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline></video>
+                </div>
+
+                <ul class="interactive-timestamps">
+                    <li data-time="0"><strong>F key on hierachy:</strong> 階層内でボーンを左クリックした後、Fキーを押すとその単一のボーンに「フォーカス」します。</li>
+                    <li data-time="23"><strong>ArmatureSetting panel Sync:</strong> ArmatureSettingパネルは自動的に同期し、選択したボーンがどのボーングループに属しているかを視覚的に特定します。これにより、PhysBoneの親が別の階層構造にネストされている場合でも、推測することなく問題をすばやくナビゲートして修正できます。</li>
+                </ul>
+            </section>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Language Switcher Logic
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.content-block').forEach(block => block.classList.remove('active'));
+            document.getElementById('content-' + lang).classList.add('active');
+        }
+
+        // Active Nav Link Highlighting on Scroll
+        const sections = document.querySelectorAll('section.panel, .section-group-title');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        // Intercept sidebar clicks to route to language-specific IDs
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const hash = this.getAttribute('href');
+                if (hash && hash.startsWith('#')) {
+                    e.preventDefault();
+                    const isJp = document.getElementById('content-jp').classList.contains('active');
+                    const targetId = isJp ? hash.substring(1) + '-jp' : hash.substring(1);
+                    const targetEl = document.getElementById(targetId);
+                    
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth' });
+                        history.pushState(null, null, hash);
+                    }
+                }
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                if (section.offsetParent === null) return; // Skip hidden elements
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id').replace('-jp', '');
+                }
+            });
+
+            if (current) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Intersection Observer for Video Autoplay/Pause (Saves processing!)
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target;
+                if (entry.isIntersecting) {
+                    const parentBlock = video.closest('.content-block');
+                    if (parentBlock && parentBlock.classList.contains('active')) {
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                    }
+                } else {
+                    video.pause();
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('video').forEach(video => {
+            videoObserver.observe(video);
+        });
+
+        // Re-check videos when language switches
+        function recheckVideos() {
+            document.querySelectorAll('video').forEach(video => {
+                const parentBlock = video.closest('.content-block');
+                const rect = video.getBoundingClientRect();
+                const isVisibleInViewport = (rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight));
+                
+                if (parentBlock.classList.contains('active') && isVisibleInViewport) {
+                    video.play().catch(e=>e);
+                } else {
+                    video.pause();
+                }
+            });
+        }
+        
+        const originalSwitch = switchLang;
+        window.switchLang = function(lang) {
+            originalSwitch(lang);
+            setTimeout(recheckVideos, 100);
+            
+            const currentHash = window.location.hash;
+            if (currentHash) {
+                const targetId = lang === 'en' ? currentHash.substring(1) : currentHash.substring(1) + '-jp';
+                const el = document.getElementById(targetId);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }
+        };
+
+        // Interactive Video Timestamps
+        document.querySelectorAll('.interactive-timestamps li').forEach(li => {
+            li.addEventListener('mouseenter', function() {
+                if (!this.hasAttribute('data-time') || this.getAttribute('data-time') === "") return;
+                const time = parseFloat(this.getAttribute('data-time'));
+                const panel = this.closest('.panel');
+                if (panel) {
+                    const video = panel.querySelector('video');
+                    if (video && video.readyState >= 1) {
+                        video.currentTime = time;
+                        this.style.color = 'var(--accent-glow)';
+                        this.style.textShadow = '0 0 10px rgba(0, 255, 204, 0.5)';
+                        this.style.transition = 'all 0.2s ease';
+                    }
+                }
+            });
+            li.addEventListener('mouseleave', function() {
+                this.style.color = '';
+                this.style.textShadow = '';
+            });
+            
+            // Initial style check
+            if (!li.hasAttribute('data-time') || li.getAttribute('data-time') === "") {
+                li.style.opacity = '0.4';
+                li.style.cursor = 'default';
+            } else {
+                li.style.cursor = 'crosshair';
+            }
+        });
+    </script>
+    <!-- DEV PANEL FOR TIMESTAMPS -->
+    <div id="dev-panel" style="position: fixed; right: 20px; top: 20px; width: 300px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--accent); border-radius: 10px; padding: 15px; z-index: 9999; backdrop-filter: blur(10px); color: white; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-top: 0; color: var(--accent); font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Timestamp Editor</h3>
+        <div id="dev-panel-content"></div>
+        <button id="dev-panel-copy" style="width: 100%; margin-top: 15px; background: var(--accent); color: black; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">Copy Config for Anya</button>
+    </div>
+    <script>
+        // Build Dev Panel
+        const devPanelContent = document.getElementById('dev-panel-content');
+        const allTimestamps = document.querySelectorAll('.interactive-timestamps li');
+        
+        // Add Sync Toggle
+        const syncWrapper = document.createElement('div');
+        syncWrapper.style.marginBottom = '15px';
+        syncWrapper.style.paddingBottom = '10px';
+        syncWrapper.style.borderBottom = '1px solid #333';
+        syncWrapper.style.display = 'flex';
+        syncWrapper.style.alignItems = 'center';
+        
+        const syncCheckbox = document.createElement('input');
+        syncCheckbox.type = 'checkbox';
+        syncCheckbox.id = 'sync-jp-en';
+        syncCheckbox.checked = true;
+        syncCheckbox.style.marginRight = '8px';
+        
+        const syncLabel = document.createElement('label');
+        syncLabel.htmlFor = 'sync-jp-en';
+        syncLabel.innerText = 'Sync JP timestamps with EN';
+        syncLabel.style.fontSize = '12px';
+        syncLabel.style.color = '#aaa';
+        syncLabel.style.cursor = 'pointer';
+        
+        syncWrapper.appendChild(syncCheckbox);
+        syncWrapper.appendChild(syncLabel);
+        devPanelContent.appendChild(syncWrapper);
+        
+        // Build grouped inputs
+        const panelGroups = {};
+        const inputElements = []; // Store references to sync later
+        
+        allTimestamps.forEach((li, index) => {
+            const textLabel = li.innerText.split(':')[0].substring(0, 20);
+            const panel = li.closest('.panel');
+            const parentId = panel.id;
+            
+            if (!panelGroups[parentId]) {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'dev-panel-group';
+                groupContainer.id = 'dev-group-' + parentId;
+                groupContainer.style.display = 'none'; // Hidden by default
+                
+                const sectionHeader = document.createElement('div');
+                sectionHeader.innerText = parentId;
+                sectionHeader.style.color = '#888';
+                sectionHeader.style.fontSize = '10px';
+                sectionHeader.style.marginTop = '10px';
+                sectionHeader.style.marginBottom = '5px';
+                sectionHeader.style.textTransform = 'uppercase';
+                
+                groupContainer.appendChild(sectionHeader);
+                devPanelContent.appendChild(groupContainer);
+                panelGroups[parentId] = groupContainer;
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '10px';
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'space-between';
+            wrapper.style.alignItems = 'center';
+            
+            const label = document.createElement('span');
+            label.innerText = textLabel;
+            label.style.fontSize = '12px';
+            label.style.opacity = '0.8';
+            label.style.whiteSpace = 'nowrap';
+            label.style.overflow = 'hidden';
+            label.style.textOverflow = 'ellipsis';
+            label.style.maxWidth = '180px';
+            
+            const input = document.createElement('input');
+            input.type = 'text'; // Changed to text to allow typing 'ignore'
+            input.value = li.getAttribute('data-time') || '';
+            input.style.width = '60px';
+            input.style.background = '#222';
+            input.style.border = '1px solid #444';
+            input.style.color = 'var(--accent)';
+            input.style.borderRadius = '3px';
+            input.style.padding = '3px';
+            
+            // Store reference for syncing
+            const isJp = parentId.endsWith('-jp');
+            const baseId = isJp ? parentId.replace('-jp', '') : parentId;
+            const elementData = { li, input, isJp, baseId, indexInList: -1 };
+            inputElements.push(elementData);
+            
+            // We need to know which index this is within its panel to sync correctly
+            elementData.indexInList = Array.from(panel.querySelectorAll('.interactive-timestamps li')).indexOf(li);
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value.trim().toLowerCase();
+                
+                if (val === 'ignore' || val === '') {
+                    li.removeAttribute('data-time');
+                    li.style.opacity = '0.4';
+                    li.style.cursor = 'default';
+                } else {
+                    li.setAttribute('data-time', val);
+                    li.style.opacity = '1';
+                    li.style.cursor = 'crosshair';
+                }
+                
+                // Seek video
+                const parsedVal = parseFloat(val);
+                if (panel && !isNaN(parsedVal)) {
+                    const video = panel.querySelector('video');
+                    if (video) video.currentTime = parsedVal;
+                }
+                
+                // Sync logic
+                if (syncCheckbox.checked && !isJp) {
+                    // Find the corresponding JP input
+                    const jpSibling = inputElements.find(el => el.isJp && el.baseId === baseId && el.indexInList === elementData.indexInList);
+                    if (jpSibling) {
+                        jpSibling.input.value = e.target.value; // Use original exact input text
+                        if (val === 'ignore' || val === '') {
+                            jpSibling.li.removeAttribute('data-time');
+                            jpSibling.li.style.opacity = '0.4';
+                            jpSibling.li.cursor = 'default';
+                        } else {
+                            jpSibling.li.setAttribute('data-time', val);
+                            jpSibling.li.style.opacity = '1';
+                            jpSibling.li.cursor = 'crosshair';
+                        }
+                    }
+                }
+            });
+            
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            panelGroups[parentId].appendChild(wrapper);
+        });
+
+        // Intersection Observer to show/hide dev panel groups based on scroll
+        const panelObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const devGroupId = 'dev-group-' + entry.target.id;
+                const groupEl = document.getElementById(devGroupId);
+                if (groupEl) {
+                    if (entry.isIntersecting) {
+                        groupEl.style.display = 'block';
+                    } else {
+                        groupEl.style.display = 'none';
+                    }
+                }
+                
+                // Highlight the sidebar link for the active panel
+                if (entry.isIntersecting) {
+                    const baseId = entry.target.id.replace('-jp', '');
+                    const activeLink = document.querySelector(`.nav-links a[href="#${baseId}"]`);
+                    if (activeLink) {
+                        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        }, { threshold: 0.2 });
+        
+        document.querySelectorAll('.panel').forEach(panel => {
+            panelObserver.observe(panel);
+        });
+
+        document.getElementById('dev-panel-copy').addEventListener('click', () => {
+            let config = {};
+            allTimestamps.forEach((li) => {
+                const id = li.closest('.panel').id;
+                if (!config[id]) config[id] = {};
+                config[id][li.innerText.split(':')[0]] = li.getAttribute('data-time');
+            });
+            navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+            alert('Copied to clipboard! Just paste it to Anya.');
+        });
+    </script>
+</body>
+</html>
