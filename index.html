@@ -158,16 +158,24 @@
         .nav-links {
             list-style: none;
             padding: 0;
+            padding-bottom: 3rem; /* Prevents last items clipping under curved border */
             margin: 0;
             flex-grow: 1;
             overflow-y: auto;
             position: relative;
             z-index: 2;
+            scroll-behavior: smooth;
         }
 
-        .nav-links::-webkit-scrollbar { width: 4px; }
+        .nav-links::-webkit-scrollbar { width: 2px; }
         .nav-links::-webkit-scrollbar-track { background: transparent; }
-        .nav-links::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 10px; }
+        .nav-links::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.15); border-radius: 10px; }
+
+        .nav-links {
+            /* Push scrollbar slightly right */
+            padding-right: 10px;
+            margin-right: -10px;
+        }
 
         .nav-links li { margin-bottom: 0.5rem; }
         
@@ -199,9 +207,48 @@
         }
 
         .nav-links .sub-link {
-            padding-left: 2.5rem;
+            padding-left: 3rem;
             font-size: 0.85rem;
             margin-top: -0.2rem;
+            position: relative;
+        }
+
+        /* Unity Hierarchy-style Vertical Line */
+        .nav-links .sub-link::before {
+            content: '';
+            position: absolute;
+            left: 1.45rem;
+            top: -2.5rem; /* Stretch up to overlap the previous item */
+            height: calc(50% + 2.5rem); /* Reach exactly to the middle of this item */
+            width: 2px;
+            background: rgba(0, 240, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        /* Prevent the first sub-link from touching the header */
+        .nav-links .first-sub-link::before {
+            top: -0.8rem;
+            height: calc(50% + 0.8rem);
+        }
+
+        /* Unity Hierarchy-style Horizontal Branch */
+        .nav-links .sub-link::after {
+            content: '';
+            position: absolute;
+            left: 1.45rem;
+            top: 50%;
+            width: 14px;
+            height: 2px;
+            background: rgba(0, 240, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        /* Highlight the connection lines when active */
+        .nav-links .sub-link.active::before,
+        .nav-links .sub-link.active::after,
+        .nav-links .sub-link.glowing-trail::before {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
         /* MAIN CONTENT */
@@ -495,7 +542,7 @@
             <button class="lang-btn" onclick="switchLang('jp')">日本語</button>
         </div>
 
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-en">
             <li><a href="#intro">1. Introduction</a></li>
             <li><a href="#nav-tools" class="sub-link">1a. Improved Navigation Tools</a></li>
             <li><a href="#settings">2. Settings Overview</a></li>
@@ -509,6 +556,22 @@
             <li><a href="#pb-usage" class="sub-link">4a. Physbone Usage</a></li>
             <li><a href="#showcase" class="sub-link">4b. Quickly locate Physbone Scripts</a></li>
             <li><a href="#focus-hierarchy" class="sub-link">4c. Focus from Hierachy to Viewport</a></li>
+        </ul>
+
+        <ul class="nav-links" id="nav-jp" style="display: none;">
+            <li><a href="#intro">1. はじめに</a></li>
+            <li><a href="#nav-tools" class="sub-link">1a. ナビゲーションツールの改善</a></li>
+            <li><a href="#settings">2. 設定の概要</a></li>
+            <li><a href="#general" class="sub-link">2a. 一般設定</a></li>
+            <li><a href="#connection" class="sub-link">2b. 接続オプション</a></li>
+            <li><a href="#subarm" class="sub-link">2c. サブアーマチュア</a></li>
+            <li><a href="#temp-group">3. ワークフローツール</a></li>
+            <li><a href="#temp-group" class="sub-link">3a. 一時的ボーングループビューア</a></li>
+            <li><a href="#improved-hierarchy" class="sub-link">3b. 階層(ヒエラルキー)の改善</a></li>
+            <li><a href="#pb-usage">4. Physbonesとの併用</a></li>
+            <li><a href="#pb-usage" class="sub-link">4a. Physboneの使用方法</a></li>
+            <li><a href="#showcase" class="sub-link">4b. Physboneの迅速な特定</a></li>
+            <li><a href="#focus-hierarchy" class="sub-link">4c. ヒエラルキーからビューポートへ</a></li>
         </ul>
     </nav>
 
@@ -901,6 +964,14 @@
 
             document.querySelectorAll('.content-block').forEach(block => block.classList.remove('active'));
             document.getElementById('content-' + lang).classList.add('active');
+
+            // Toggle Navigation Sidebar
+            document.querySelectorAll('.nav-links').forEach(nav => nav.style.display = 'none');
+            const targetNav = document.getElementById('nav-' + lang);
+            if (targetNav) targetNav.style.display = 'block';
+            
+            // Re-trigger scroll event to update active links for the new language sidebar
+            window.dispatchEvent(new Event('scroll'));
         }
 
         // Active Nav Link Highlighting on Scroll
@@ -925,6 +996,17 @@
             });
         });
 
+        // Initialize first sub-links so they don't touch headers
+        document.querySelectorAll('.nav-links li').forEach(li => {
+            const a = li.querySelector('a');
+            if (a && a.classList.contains('sub-link')) {
+                const prevLi = li.previousElementSibling;
+                if (prevLi && prevLi.querySelector('a') && !prevLi.querySelector('a').classList.contains('sub-link')) {
+                    a.classList.add('first-sub-link');
+                }
+            }
+        });
+
         window.addEventListener('scroll', () => {
             let current = '';
             sections.forEach(section => {
@@ -936,10 +1018,46 @@
             });
 
             if (current) {
-                navLinks.forEach(link => {
+                // Ensure navLinks grabs active language nav
+                const activeNavLinks = document.querySelectorAll('.nav-links[style*="display: block"] a, .nav-links:not([style*="display: none"]) a');
+                
+                // Clear all glowing trails
+                document.querySelectorAll('.nav-links .sub-link').forEach(link => link.classList.remove('glowing-trail'));
+
+                activeNavLinks.forEach(link => {
                     link.classList.remove('active');
                     if (link.getAttribute('href') === `#${current}`) {
                         link.classList.add('active');
+                        
+                        // Add glowing trail backwards to all previous sub-links up to the header
+                        if (link.classList.contains('sub-link')) {
+                            let prevLi = link.parentElement.previousElementSibling;
+                            while (prevLi) {
+                                const prevLink = prevLi.querySelector('a');
+                                if (prevLink && prevLink.classList.contains('sub-link')) {
+                                    prevLink.classList.add('glowing-trail');
+                                } else {
+                                    break;
+                                }
+                                prevLi = prevLi.previousElementSibling;
+                            }
+                        }
+
+                        // Scroll sidebar to keep active link in view
+                        const navContainer = link.closest('.nav-links');
+                        if (navContainer) {
+                            const linkTop = link.offsetTop;
+                            const linkBottom = linkTop + link.offsetHeight;
+                            const containerTop = navContainer.scrollTop;
+                            const containerBottom = containerTop + navContainer.clientHeight;
+                            
+                            // 20px padding buffer for visual comfort
+                            if (linkTop < containerTop + 20) {
+                                navContainer.scrollTop = linkTop - 20;
+                            } else if (linkBottom > containerBottom - 40) {
+                                navContainer.scrollTop = linkBottom - navContainer.clientHeight + 40;
+                            }
+                        }
                     }
                 });
             }
