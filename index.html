@@ -388,6 +388,12 @@
             margin-bottom: 12px;
         }
 
+        @keyframes pulseHint {
+            0% { opacity: 0.2; transform: scale(1) translateX(0); text-shadow: 0 0 0 transparent; }
+            50% { opacity: 0.7; transform: scale(1.2) translateX(2px); color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+            100% { opacity: 0.2; transform: scale(1) translateX(0); text-shadow: 0 0 0 transparent; }
+        }
+
         .interactive-timestamps li[data-time]::before, .interactive-videos li[data-video-src]::before {
             content: "▶";
             position: absolute;
@@ -395,7 +401,8 @@
             color: var(--neon-cyan);
             font-size: 0.9em;
             opacity: 0.3;
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+            animation: pulseHint 2s infinite ease-in-out;
         }
 
         .interactive-timestamps li[data-time]:hover, .interactive-videos li[data-video-src]:hover {
@@ -404,6 +411,9 @@
 
         .interactive-timestamps li[data-time]:hover::before, .interactive-videos li[data-video-src]:hover::before {
             opacity: 1;
+            color: var(--neon-cyan);
+            animation: none;
+            text-shadow: 0 0 8px var(--neon-cyan);
         }
 
         .interactive-timestamps li[data-time]::after {
@@ -421,6 +431,22 @@
 
         .interactive-timestamps li[data-time]:hover::after {
             opacity: 1;
+        }
+
+        /* Visited state */
+        .interactive-timestamps li.visited-item:not(:hover)::before, .interactive-videos li.visited-item:not(:hover)::before {
+            content: "✓";
+            color: var(--neon-cyan);
+            opacity: 0.4;
+            animation: none;
+            text-shadow: none;
+            transform: translateX(0);
+        }
+        .interactive-timestamps li.visited-item:not(:hover), .interactive-videos li.visited-item:not(:hover) {
+            color: #64748b;
+        }
+        .interactive-timestamps li.visited-item:not(:hover) strong, .interactive-videos li.visited-item:not(:hover) strong {
+            color: #8fa0b5;
         }
 
         /* VIDEO TABS */
@@ -638,7 +664,7 @@
 
                 <h3>Quickstart</h3>
                 <div class="video-container">
-                    <video src="assets/GetStart1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/GetStart1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
             </section>
 
@@ -655,14 +681,14 @@
                     <div class="split-video" style="flex: 1; margin: 0;">
                         <h4 style="text-align: center; margin: 0 0 10px 0; padding: 10px 0; color: #ff0055; font-size: 1.2rem;">Default Navigation</h4>
                         <div class="video-container" style="margin: 0;">
-                            <video src="assets/OffNavigation1.mp4" controls loop muted playsinline></video>
+                            <video src="assets/OffNavigation1.mp4" controls loop muted playsinline preload="none"></video>
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">The default unity navigation is very cumbersome, as you can see in the video, multiple attempts to re-align the video are needed from the user to merely "navigate" to what the user wants to see.</p>
                     </div>
                     <div class="split-video" style="flex: 1; margin: 0;">
                         <h4 style="text-align: center; margin: 0 0 10px 0; padding: 10px 0; color: #00f0ff; font-size: 1.2rem;">Improved Navigation</h4>
                         <div class="video-container" style="margin: 0;">
-                            <video src="assets/OnNavigation1.mp4" controls loop muted playsinline></video>
+                            <video src="assets/OnNavigation1.mp4" controls loop muted playsinline preload="none"></video>
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">With Improved Navigation from NeonMaruTools, simply press the bone object you want to focus on, and the script does the rest, focus on what you want to work on without fighting your camera!</p>
                     </div>
@@ -676,7 +702,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/NavRot1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/NavRot1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -694,7 +720,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/NavRot2.mp4" controls loop muted playsinline></video>
+                        <video src="assets/NavRot2.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -721,7 +747,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-timestamps" id="ts-rot-en" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -752,7 +778,7 @@
                 <h3>1e. Quickly swap rendering modes</h3>
                 <p>We've also implemented blender's pie menu to select rendering modes. Simply hold down the Z-key and move your mouse to the desired rendering mode to see the bones clearer.</p>
                 <div class="video-container" style="max-width: 80%;">
-                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
             </section>
 
@@ -766,7 +792,7 @@
                 <p>The General Settings tab gives you complete control over what information is shown in your viewport. You can toggle the entire tool on/off, hide non-essential bones to declutter your hierarchy, and configure how visual guides are drawn.</p>
                 
                 <div class="video-container">
-                    <video src="assets/Settings1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/Settings1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
                 
                 <h3>Setting Breakdown</h3>
@@ -788,7 +814,7 @@
                 <p>The Connection Options tab lets you customize how the bones are visually connected and rendered. You can adjust the render style, thickness, and joint sizes to your exact preference.</p>
                 
                 <div class="video-container">
-                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
                 
                 <ul class="interactive-timestamps">
@@ -806,7 +832,7 @@
                 <p>This section allows you to customize how different sub-armature systems are color-coded in your hierarchy. You can independently set the Shaded and Wireframe colors for the Core Armature, Custom, PhysB, and Auto-detected bone groups.</p>
                 
                 <div class="video-container">
-                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -827,7 +853,7 @@
                 <p>This section explains how to manually assign specific bones to a "Custom" group for easy access. You can add or remove bones and view them together under the Custom Group Display.</p>
                 
                 <div class="video-container">
-                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -845,7 +871,7 @@
                 <p><em>Please pay attention to the hotkeys being pressed on the bottom left corner of the screen.</em></p>
                 
                 <div class="video-container">
-                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -863,7 +889,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-timestamps" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -879,7 +905,7 @@
                 <p>No matter how complicated your Physbone structure is, this tool helps you find what you are looking for within a few seconds, please observe the hierarchy.</p>
                 
                 <div class="video-container">
-                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -894,7 +920,7 @@
                 <p>We've added an additional function to find bones from Hierachy ---> Viewport. This feature syncs with the ArmatureSetting panel to tell you exactly which bone group it's part of.</p>
                 
                 <div class="video-container">
-                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -948,14 +974,14 @@
                     <div class="split-video" style="flex: 1; margin: 0;">
                         <h4 style="text-align: center; margin: 0 0 10px 0; padding: 10px 0; color: #ff0055; font-size: 1.15rem;">デフォルトのナビゲーション (Default Navigation)</h4>
                         <div class="video-container" style="margin: 0;">
-                            <video src="assets/OffNavigation1.mp4" controls loop muted playsinline></video>
+                            <video src="assets/OffNavigation1.mp4" controls loop muted playsinline preload="none"></video>
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">デフォルトのUnityナビゲーションは非常に面倒です。動画で確認できるように、目的の場所に単に「移動」するためだけでも、何度もカメラの再調整を行う必要があります。</p>
                     </div>
                     <div class="split-video" style="flex: 1; margin: 0;">
                         <h4 style="text-align: center; margin: 0 0 10px 0; padding: 10px 0; color: #00f0ff; font-size: 1.15rem;">改善されたナビゲーション (Improved Navigation)</h4>
                         <div class="video-container" style="margin: 0;">
-                            <video src="assets/OnNavigation1.mp4" controls loop muted playsinline></video>
+                            <video src="assets/OnNavigation1.mp4" controls loop muted playsinline preload="none"></video>
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">NeonMaruToolsの改善されたナビゲーションを使用すると、フォーカスしたいボーンオブジェクトを押すだけで、後はスクリプトが自動で行います。カメラと格闘することなく、作業したい部分に集中できます！</p>
                     </div>
@@ -969,7 +995,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/NavRot1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/NavRot1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -987,7 +1013,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/NavRot2.mp4" controls loop muted playsinline></video>
+                        <video src="assets/NavRot2.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -1014,7 +1040,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-timestamps" id="ts-rot-jp" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -1045,7 +1071,7 @@
                 <h3>1e. レンダリングモードの素早い切り替え (Quickly swap rendering modes)</h3>
                 <p>レンダリングモードを選択するためのBlenderのパイメニューも実装しました。Zキーを押し続け、マウスを希望のレンダリングモードに動かすだけで、ボーンがよりはっきりと見えます。</p>
                 <div class="video-container" style="max-width: 80%;">
-                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
             </section>
 
@@ -1059,7 +1085,7 @@
                 <p>一般設定タブでは、ビューポートに表示される情報を完全に制御できます。ツール全体のオン/オフを切り替えたり、不要なボーンを非表示にして階層を整理したり、視覚ガイドの描画方法を設定したりできます。</p>
                 
                 <div class="video-container">
-                    <video src="assets/Settings1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/Settings1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
                 
                 <h3>設定の詳細</h3>
@@ -1081,7 +1107,7 @@
                 <p>接続オプションタブでは、ボーンが視覚的にどのように接続され、レンダリングされるかをカスタマイズできます。レンダリングスタイル、太さ、ジョイントのサイズを好みに合わせて調整できます。</p>
                 
                 <div class="video-container">
-                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/ConnectionOptions1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
                 
                 <ul class="interactive-timestamps">
@@ -1099,7 +1125,7 @@
                 <p>ここでは、異なるサブアーマチュアシステムが階層内でどのように色分けされるかをカスタマイズできます。Core Armature、Custom、PhysB、および自動検出グループのShaded色とWireframe色を個別に設定できます。</p>
                 
                 <div class="video-container">
-                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/SubArmatures1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -1120,7 +1146,7 @@
                 <p>このセクションでは、特定のボーンを手動で「Custom」グループに割り当てて簡単にアクセスできるようにする方法を説明します。Custom Group Display（カスタムグループ表示）でボーンを追加、削除、一括表示できます。</p>
                 
                 <div class="video-container">
-                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/TempArmature1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -1138,7 +1164,7 @@
                 <p><em>画面左下に表示されるホットキーの入力に注意してください。</em></p>
                 
                 <div class="video-container">
-                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/ImprovedHierachy1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -1156,7 +1182,7 @@
                 
                 <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
                     <div class="video-container" style="flex: 0 0 65%; margin: 0;">
-                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline></video>
+                        <video src="assets/PBOverview1.mp4" controls loop muted playsinline preload="none"></video>
                     </div>
 
                     <ul class="interactive-timestamps" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
@@ -1172,7 +1198,7 @@
                 <p>PhysBoneの構造がどれほど複雑であっても、このツールを使えば数秒で探しているものを見つけることができます。階層（Hierarchy）を観察してください。</p>
                 
                 <div class="video-container">
-                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/PhysBoney1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -1187,7 +1213,7 @@
                 <p>階層（Hierarchy）からビューポートへボーンを見つける機能を追加しました。この機能はArmatureSettingパネルと同期し、どのボーングループに属しているかを正確に教えてくれます。</p>
                 
                 <div class="video-container">
-                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline></video>
+                    <video src="assets/FHierachy1.mp4" controls loop muted playsinline preload="none"></video>
                 </div>
 
                 <ul class="interactive-timestamps">
@@ -1384,13 +1410,39 @@
         document.querySelectorAll('.interactive-timestamps li').forEach(li => {
             li.addEventListener('mouseenter', function() {
                 if (!this.hasAttribute('data-time') || this.getAttribute('data-time') === "") return;
+                
+                if (this.getAttribute('data-permanent-check') !== 'true') {
+                    if (this.dataset.visitedTimeout) clearTimeout(parseInt(this.dataset.visitedTimeout));
+                    if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
+                    
+                    this.dataset.hoverCheckTimeout = setTimeout(() => {
+                        this.classList.add('visited-item');
+                        this.dataset.visitedTimeout = setTimeout(() => {
+                            this.classList.remove('visited-item');
+                        }, 60000);
+                    }, 1000);
+                }
                 const time = parseFloat(this.getAttribute('data-time'));
                 const panel = this.closest('.panel');
                 if (panel) {
                     const videoContainer = panel.querySelector('.video-container');
                     const video = panel.querySelector('video');
-                    if (video && video.readyState >= 1) {
-                        video.currentTime = time;
+                    if (video) {
+                        const playAndSeek = () => {
+                            video.currentTime = time;
+                            video.play().catch(e => e);
+                        };
+
+                        if (video.readyState >= 1) {
+                            playAndSeek();
+                        } else {
+                            video.load();
+                            video.addEventListener('loadedmetadata', function onLoaded() {
+                                playAndSeek();
+                                video.removeEventListener('loadedmetadata', onLoaded);
+                            });
+                        }
+
                         this.style.color = 'var(--accent-glow)';
                         this.style.textShadow = '0 0 10px rgba(0, 255, 204, 0.5)';
                         
@@ -1403,6 +1455,7 @@
                 }
             });
             li.addEventListener('mouseleave', function() {
+                if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
                 this.style.color = '';
                 this.style.textShadow = '';
                 const panel = this.closest('.panel');
@@ -1422,12 +1475,33 @@
             } else {
                 li.style.cursor = 'pointer';
             }
+
+            li.addEventListener('click', function() {
+                if (!this.hasAttribute('data-time') || this.getAttribute('data-time') === "") return;
+                if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
+                if (this.dataset.visitedTimeout) clearTimeout(parseInt(this.dataset.visitedTimeout));
+                
+                this.setAttribute('data-permanent-check', 'true');
+                this.classList.add('visited-item');
+            });
         });
 
         // Interactive Video Swapping
         document.querySelectorAll('.interactive-videos li').forEach(li => {
             li.addEventListener('mouseenter', function() {
                 if (!this.hasAttribute('data-video-src') || this.getAttribute('data-video-src') === "") return;
+
+                if (this.getAttribute('data-permanent-check') !== 'true') {
+                    if (this.dataset.visitedTimeout) clearTimeout(parseInt(this.dataset.visitedTimeout));
+                    if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
+                    
+                    this.dataset.hoverCheckTimeout = setTimeout(() => {
+                        this.classList.add('visited-item');
+                        this.dataset.visitedTimeout = setTimeout(() => {
+                            this.classList.remove('visited-item');
+                        }, 60000);
+                    }, 1000);
+                }
                 const src = this.getAttribute('data-video-src');
                 const panel = this.closest('.panel');
                 if (panel) {
@@ -1435,12 +1509,31 @@
                     const video = panel.querySelector('video');
                     if (video) {
                         // Swap source if different
+                        let isNewSrc = false;
                         if (!video.src.endsWith(src)) {
                             // Set explicit aspect-ratio before swapping to prevent snapping
                             if (video.videoWidth && video.videoHeight) {
                                 video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
                             }
                             video.src = src;
+                            isNewSrc = true;
+                        }
+
+                        const timeAttr = this.getAttribute('data-time');
+                        if (timeAttr && timeAttr !== "") {
+                            const time = parseFloat(timeAttr);
+                            if (video.readyState >= 1 && !isNewSrc) {
+                                video.currentTime = time;
+                                video.play().catch(e=>e);
+                            } else {
+                                video.addEventListener('loadedmetadata', function onLoaded() {
+                                    video.currentTime = time;
+                                    video.play().catch(e=>e);
+                                    video.removeEventListener('loadedmetadata', onLoaded);
+                                });
+                                if (!isNewSrc) video.load();
+                            }
+                        } else {
                             video.play().catch(e=>e);
                         }
 
@@ -1456,6 +1549,7 @@
                 }
             });
             li.addEventListener('mouseleave', function() {
+                if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
                 this.style.color = '';
                 this.style.textShadow = '';
                 const panel = this.closest('.panel');
@@ -1475,6 +1569,15 @@
             } else {
                 li.style.cursor = 'pointer';
             }
+
+            li.addEventListener('click', function() {
+                if (!this.hasAttribute('data-video-src') || this.getAttribute('data-video-src') === "") return;
+                if (this.dataset.hoverCheckTimeout) clearTimeout(parseInt(this.dataset.hoverCheckTimeout));
+                if (this.dataset.visitedTimeout) clearTimeout(parseInt(this.dataset.visitedTimeout));
+                
+                this.setAttribute('data-permanent-check', 'true');
+                this.classList.add('visited-item');
+            });
         });
 
         // Tab button video swapping
@@ -1522,6 +1625,28 @@
                 }
             });
         });
+        // Lazy Video Hover Play
+        document.querySelectorAll('.panel').forEach(panel => {
+            let hoverTimeout;
+            panel.addEventListener('mouseenter', () => {
+                hoverTimeout = setTimeout(() => {
+                    panel.querySelectorAll('video').forEach(video => {
+                        if (video.paused) {
+                            video.play().catch(e => console.log("Play prevented:", e));
+                        }
+                    });
+                }, 2000);
+            });
+            
+            panel.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimeout);
+                panel.querySelectorAll('video').forEach(video => {
+                    if (!video.paused) {
+                        video.pause();
+                    }
+                });
+            });
+        });
     </script>
     <!-- DEV PANEL FOR TIMESTAMPS -->
     <div id="dev-panel" style="display: none; position: fixed; right: 20px; top: 20px; width: 300px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--accent); border-radius: 10px; padding: 15px; z-index: 9999; backdrop-filter: blur(10px); color: white; max-height: 90vh; overflow-y: auto;">
@@ -1532,7 +1657,7 @@
     <script>
         // Build Dev Panel
         const devPanelContent = document.getElementById('dev-panel-content');
-        const allTimestamps = document.querySelectorAll('.interactive-timestamps li');
+        const allTimestamps = document.querySelectorAll('.interactive-timestamps li, .interactive-videos li');
         
         // Add Sync Toggle
         const syncWrapper = document.createElement('div');
