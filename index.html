@@ -375,20 +375,20 @@
         p, li { font-size: 1.05rem; color: #cbd5e1; font-weight: 300; }
         strong { font-weight: 600; color: #ffffff; }
 
-        /* INTERACTIVE TIMESTAMPS */
-        .interactive-timestamps {
+        /* INTERACTIVE TIMESTAMPS & VIDEOS */
+        .interactive-timestamps, .interactive-videos {
             list-style: none;
             padding-left: 0;
         }
 
-        .interactive-timestamps li {
+        .interactive-timestamps li, .interactive-videos li {
             position: relative;
             transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
             padding-left: 24px;
             margin-bottom: 12px;
         }
 
-        .interactive-timestamps li[data-time]::before {
+        .interactive-timestamps li[data-time]::before, .interactive-videos li[data-video-src]::before {
             content: "▶";
             position: absolute;
             left: 0;
@@ -398,11 +398,11 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        .interactive-timestamps li[data-time]:hover {
+        .interactive-timestamps li[data-time]:hover, .interactive-videos li[data-video-src]:hover {
             transform: translateX(5px);
         }
 
-        .interactive-timestamps li[data-time]:hover::before {
+        .interactive-timestamps li[data-time]:hover::before, .interactive-videos li[data-video-src]:hover::before {
             opacity: 1;
         }
 
@@ -421,6 +421,38 @@
 
         .interactive-timestamps li[data-time]:hover::after {
             opacity: 1;
+        }
+
+        /* VIDEO TABS */
+        .video-tabs {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: rgba(20, 25, 40, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            border-color: rgba(0, 240, 255, 0.3);
+            color: #fff;
+            background: rgba(0, 240, 255, 0.05);
+        }
+        .tab-btn.active {
+            border-color: var(--neon-cyan);
+            color: #fff;
+            background: rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
         /* LIQUID VIDEO CONTAINER */
@@ -543,8 +575,13 @@
         </div>
 
         <ul class="nav-links" id="nav-en">
-            <li><a href="#intro">1. Introduction</a></li>
+            <li><a href="#intro">0. Introduction</a></li>
+            <li><a href="#nav-hotkeys">1. Navigation Hotkeys</a></li>
             <li><a href="#nav-tools" class="sub-link">1a. Improved Navigation Tools</a></li>
+            <li><a href="#hotkey-controls-blender" class="sub-link">1b. Hotkey movement controls (blender)</a></li>
+            <li><a href="#hotkey-controls-unity" class="sub-link">1c. Hotkey movement controls (Unity)</a></li>
+            <li><a href="#adv-hotkey-controls" class="sub-link">1d. Advanced Hotkey Controls</a></li>
+            <li><a href="#pie-menu-en" class="sub-link">1e. Quickly swap rendering modes</a></li>
             <li><a href="#settings">2. Settings Overview</a></li>
             <li><a href="#general" class="sub-link">2a. General Settings</a></li>
             <li><a href="#connection" class="sub-link">2b. Connection Options</a></li>
@@ -556,11 +593,17 @@
             <li><a href="#pb-usage" class="sub-link">4a. Physbone Usage</a></li>
             <li><a href="#showcase" class="sub-link">4b. Quickly locate Physbone Scripts</a></li>
             <li><a href="#focus-hierarchy" class="sub-link">4c. Focus from Hierachy to Viewport</a></li>
+            <li><a href="#tool-showcase">5. Tool Showcase</a></li>
         </ul>
 
         <ul class="nav-links" id="nav-jp" style="display: none;">
-            <li><a href="#intro">1. はじめに</a></li>
-            <li><a href="#nav-tools" class="sub-link">1a. ナビゲーションツールの改善</a></li>
+            <li><a href="#intro-jp">0. はじめに</a></li>
+            <li><a href="#nav-hotkeys-jp">1. ナビゲーション・ホットキー</a></li>
+            <li><a href="#nav-tools-jp" class="sub-link">1a. ナビゲーションツールの改善</a></li>
+            <li><a href="#hotkey-controls-blender-jp" class="sub-link">1b. ホットキー移動操作 (Blender)</a></li>
+            <li><a href="#hotkey-controls-unity-jp" class="sub-link">1c. ホットキー移動操作 (Unity)</a></li>
+            <li><a href="#adv-hotkey-controls-jp" class="sub-link">1d. 高度なホットキー操作</a></li>
+            <li><a href="#pie-menu-jp" class="sub-link">1e. レンダリングモードの素早い切り替え</a></li>
             <li><a href="#settings">2. 設定の概要</a></li>
             <li><a href="#general" class="sub-link">2a. 一般設定</a></li>
             <li><a href="#connection" class="sub-link">2b. 接続オプション</a></li>
@@ -572,6 +615,7 @@
             <li><a href="#pb-usage" class="sub-link">4a. Physboneの使用方法</a></li>
             <li><a href="#showcase" class="sub-link">4b. Physboneの迅速な特定</a></li>
             <li><a href="#focus-hierarchy" class="sub-link">4c. ヒエラルキーからビューポートへ</a></li>
+            <li><a href="#tool-showcase-jp">5. ツール紹介</a></li>
         </ul>
     </nav>
 
@@ -582,13 +626,13 @@
         <div id="content-en" class="content-block active">
             
             <section id="intro" class="panel">
-                <h2><span class="step-icon">1</span> Introduction</h2>
+                <h2><span class="step-icon">0</span> Introduction</h2>
                 <p>NeonMaruTools is a collection of Quality of Life tools that is designed to solve unity's biggest bottleneck : The Way users navigate with the Viewport and the ease of accessing bones visually and quickly. Using my experience as a blender artist, i've always liked the way you could interact with any object just by pressing hotkeys and moving the mouse to where you want it to go, without needing to drag manipulators, saving tons of time while being really intuitive. With this, i'm creating a set of tools that will bring that seamless experience into Unity.</p>
                 <p>This website contains information on how to effectively use NeonMaruTools. Please refer to the video tutorials as they are pretty self explanatory.</p>
                 <p><strong>Requirements:</strong> Unity 2022.3.22f1 (or newer) & VRChat SDK.</p>
                 
                 <div>
-                    <a href="#" class="btn-link">Discord Server</a>
+                    <a href="https://discord.gg/hCD4PBrjvp" class="btn-link" target="_blank">Discord Server</a>
                     <a href="#" class="btn-link">BOOTH Store</a>
                 </div>
 
@@ -597,6 +641,11 @@
                     <video src="assets/GetStart1.mp4" controls loop muted playsinline></video>
                 </div>
             </section>
+
+            <!-- Section 1 Group Title -->
+            <div class="section-group-title" id="nav-hotkeys">
+                <h2>1. Navigation Hotkeys</h2>
+            </div>
 
             <section id="nav-tools" class="panel">
                 <h3>1a. Improved Navigation Tools</h3>
@@ -617,6 +666,93 @@
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">With Improved Navigation from NeonMaruTools, simply press the bone object you want to focus on, and the script does the rest, focus on what you want to work on without fighting your camera!</p>
                     </div>
+                </div>
+            </section>
+
+            <section id="hotkey-controls-blender" class="panel">
+                <h3>1b. Hotkey movement controls (blender)</h3>
+                <p>In Blender, we usually ignore the manipulators / gizmos to move objects. We simply press these hotkeys to move our objects, and moving our mouse towards where we want the rotation / position or scale to be. The movement direction will be based on where the camera is facing. Please observe the video for better explination</p>
+                <p><i>Pay attention to the bottom left corner on the showcaster as hotkeys are being pressed.</i></p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/NavRot1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-video-src="assets/NavRot1.mp4"><strong>R to rotate:</strong> Press R to rotate the bone.</li>
+                        <li data-video-src="assets/NavMove1.mp4"><strong>G to move:</strong> Press G to move the bone.</li>
+                        <li data-video-src="assets/NavScale1.mp4"><strong>S to scale:</strong> Press S to scale the bone.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="hotkey-controls-unity" class="panel">
+                <h3>1c. Hotkey movement controls (Unity)</h3>
+                <p>NeonMaruTools fully integrates with Unity's native transform hotkeys as well if that is your preference. You can interact with bones directly using Unity's default keys without needing to click the exact manipulator arrows.</p>
+                <p><i>Pay attention to the bottom left corner on the showcaster as hotkeys are being pressed.</i></p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/NavRot2.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-video-src="assets/NavRot2.mp4"><strong>E to rotate:</strong> Press E to rotate the bone.</li>
+                        <li data-video-src="assets/NavMove2.mp4"><strong>W to move:</strong> Press W to move the bone.</li>
+                        <li data-video-src="assets/NavScale2.mp4"><strong>R to scale:</strong> Press R to scale the bone.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="adv-hotkey-controls" class="panel">
+                <h3>1d. Advanced Hotkey Controls</h3>
+                <p id="desc-rot-en" class="adv-desc">We've also implemented a very useful blender hotkey shortcut that allows you to rotate a bone / object along the x, y or z axis. The basic principle is once you press, R to rotate (blender controls), you press X if you want to rotate along the global X-axis, press X again to rotate along the object's local x-axis.</p>
+                <p id="desc-move-en" class="adv-desc" style="display:none;">We've also implemented a very useful blender hotkey shortcut that allows you to move a bone / object along the x, y or z axis. The basic principle is once you press, G to move (blender controls), you press X if you want to move along the global X-axis, press X again to move along the object's local x-axis.</p>
+                <p id="desc-scale-en" class="adv-desc" style="display:none;">We've also implemented a very useful blender hotkey shortcut that allows you to scale a bone / object along the x, y or z axis. The basic principle is once you press, S to scale (blender controls), you press X if you want to scale along the global X-axis, press X again to scale along the object's local x-axis.</p>
+                <p><i>It is difficult to explain, please watch the videos and observe the showcaster at the bottom left side while it is being pressed.</i></p>
+                <p><i>Please note, the videos do not cover full functionality, I only recorded what I thought was useful.</i></p>
+                
+                <div class="video-tabs">
+                    <button class="tab-btn active" data-video-src="assets/AdvNavRot1.mp4" data-ts-target="ts-rot-en">Rotate</button>
+                    <button class="tab-btn" data-video-src="assets/AdvNavMove1.mp4" data-ts-target="ts-move-en">Move</button>
+                    <button class="tab-btn" data-video-src="assets/AdvNavScale1.mp4" data-ts-target="ts-scale-en">Scale</button>
+                </div>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-timestamps" id="ts-rot-en" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-time="2"><strong>Rotating along X-axis:</strong> Press R hotkey first, then press X</li>
+                        <li data-time="14"><strong>Rotating along Y-axis (global):</strong> Press R hotkey first, then press Y</li>
+                        <li data-time="36"><strong>Rotating along Y-axis (local):</strong> Press R hotkey first, then press Y, Y</li>
+                        <li data-time="18"><strong>Rotating along Z-axis:</strong> Press R hotkey first, then press Z</li>
+                    </ul>
+
+                    <ul class="interactive-timestamps" id="ts-move-en" style="flex: 1; margin-top: 0; display: none; flex-direction: column; gap: 10px;">
+                        <li data-time="33"><strong>Moving along X-axis (global):</strong> Press G key first, press X twice</li>
+                        <li data-time="0"><strong>Moving along X-axis (local):</strong> Press G key first, then press X</li>
+                        <li data-time="43"><strong>Moving along Y-axis (global):</strong> Press G key first, press Y twice</li>
+                        <li data-time="3"><strong>Moving along Y-axis (local):</strong> Press G key first, then press Y</li>
+                        <li data-time="12"><strong>Moving along Z-axis (global):</strong> Press G key first, press Z twice</li>
+                        <li data-time="49"><strong>Moving along Z-axis (local):</strong> Press G key first, then press Z</li>
+                    </ul>
+
+                    <ul class="interactive-timestamps" id="ts-scale-en" style="flex: 1; margin-top: 0; display: none; flex-direction: column; gap: 10px;">
+                        <li data-time="0"><strong>Scaling along X-axis (global):</strong> Press S hotkey first, then press X</li>
+                        <li data-time="13"><strong>Scaling along Y-axis (global):</strong> Press S hotkey first, then press Y</li>
+                        <li data-time="24"><strong>Scaling along Z-axis (global):</strong> Press S hotkey first, then press Z</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="pie-menu-en" class="panel">
+                <h3>1e. Quickly swap rendering modes</h3>
+                <p>We've also implemented blender's pie menu to select rendering modes. Simply hold down the Z-key and move your mouse to the desired rendering mode to see the bones clearer.</p>
+                <div class="video-container" style="max-width: 80%;">
+                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline></video>
                 </div>
             </section>
 
@@ -767,21 +903,42 @@
                 </ul>
             </section>
 
+            <section id="tool-showcase" class="panel">
+                <h2><span class="step-icon">5</span> Tool Showcase</h2>
+                <p>Below is a video i've recorded to showcase how fast you can achieve a new "pose" with this new tool, in merely 3 minutes, i've managed to complete a new pose featuring homelander's ass scene using the list of tools mentioned in this documentation. I hope this documentation was useful, please consider buying the tool.</p>
+                
+                <div style="margin-bottom: 25px;">
+                    <a href="#" class="btn-link" style="padding: 12px 28px; font-size: 1.2rem; background: rgba(255, 0, 85, 0.2); border-color: var(--neon-pink); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);">Purchase on BOOTH</a>
+                </div>
+
+                <div class="video-container" style="position: relative; padding-bottom: 62.5%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px;">
+                    <iframe src="https://www.youtube-nocookie.com/embed/3DVMLt2VeAU?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0" 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+            </section>
+
         </div>
 
         <!-- ================= JAPANESE ================= -->
         <div id="content-jp" class="content-block">
             
             <section id="intro-jp" class="panel">
-                <h2><span class="step-icon">1</span> はじめに</h2>
+                <h2><span class="step-icon">0</span> はじめに</h2>
                 <p>NeonMaruToolsのクローズドベータへようこそ！このツールは、アーマチュアのオーバーレイ表示と素早い階層選択を提供することで、アバター改変のワークフローを高速化するように設計されています。</p>
                 <p><strong>動作環境:</strong> Unity 2022.3.22f1 (またはそれ以降) & VRChat SDK.</p>
                 
                 <div>
-                    <a href="#" class="btn-link">Discord サーバー</a>
+                    <a href="https://discord.gg/zrqfxqthdb" class="btn-link" target="_blank">Discord サーバー</a>
                     <a href="#" class="btn-link">BOOTH ストア</a>
                 </div>
             </section>
+
+            <!-- Section 1 Group Title -->
+            <div class="section-group-title" id="nav-hotkeys-jp">
+                <h2>1. ナビゲーション・ホットキー</h2>
+            </div>
 
             <section id="nav-tools-jp" class="panel">
                 <h3>1a. 改善されたナビゲーションツール (Improved Navigation Tools)</h3>
@@ -802,6 +959,93 @@
                         </div>
                         <p style="font-size: 0.95rem; line-height: 1.5; margin-top: 15px; text-align: justify;">NeonMaruToolsの改善されたナビゲーションを使用すると、フォーカスしたいボーンオブジェクトを押すだけで、後はスクリプトが自動で行います。カメラと格闘することなく、作業したい部分に集中できます！</p>
                     </div>
+                </div>
+            </section>
+
+            <section id="hotkey-controls-blender-jp" class="panel">
+                <h3>1b. ホットキー移動操作 (Blender)</h3>
+                <p>Blenderでは通常、オブジェクトを移動するためにマニピュレーターやギズモは無視し、以下のホットキーを押して、回転・移動・スケールさせたい方向にマウスを動かすだけで操作します。移動方向はカメラが向いている方向に基づきます。詳しい説明は動画をご覧ください。</p>
+                <p><i>ホットキーが押された際、左下のショートカット表示（ショーキャスター）に注目してください。</i></p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/NavRot1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-video-src="assets/NavRot1.mp4"><strong>Rで回転 (Rotate):</strong> Rキーを押してボーンを回転させます。</li>
+                        <li data-video-src="assets/NavMove1.mp4"><strong>Gで移動 (Grab):</strong> Gキーを押してボーンを移動させます。</li>
+                        <li data-video-src="assets/NavScale1.mp4"><strong>Sでスケール (Scale):</strong> Sキーを押してボーンをスケールします。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="hotkey-controls-unity-jp" class="panel">
+                <h3>1c. ホットキー移動操作 (Unity)</h3>
+                <p>NeonMaruToolsはUnityの標準トランスフォームホットキーと完全に統合されています。マニピュレーターの矢印を直接クリックしなくても、Unityの標準キーを使用してボーンを直接操作できます。</p>
+                <p><i>ホットキーが押された際、左下のショートカット表示（ショーキャスター）に注目してください。</i></p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/NavRot2.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-videos" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-video-src="assets/NavRot2.mp4"><strong>Eで回転:</strong> Eキーを押してボーンを回転させます。</li>
+                        <li data-video-src="assets/NavMove2.mp4"><strong>Wで移動:</strong> Wキーを押してボーンを移動させます。</li>
+                        <li data-video-src="assets/NavScale2.mp4"><strong>Rでスケール:</strong> Rキーを押してボーンをスケールします。</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="adv-hotkey-controls-jp" class="panel">
+                <h3>1d. 高度なホットキー操作 (Advanced Hotkey Controls)</h3>
+                <p id="desc-rot-jp" class="adv-desc">ボーンやオブジェクトをX、Y、Z軸に沿って回転できる、非常に便利なBlenderのホットキーショートカットも実装しました。基本的な原理として、例えばRを押して回転（Blenderの操作）する状態にした後、Xを押すとグローバルX軸に沿って回転します。もう一度Xを押すと、オブジェクトのローカルX軸に沿って回転します。</p>
+                <p id="desc-move-jp" class="adv-desc" style="display:none;">ボーンやオブジェクトをX、Y、Z軸に沿って移動できる、非常に便利なBlenderのホットキーショートカットも実装しました。基本的な原理として、例えばGを押して移動（Blenderの操作）する状態にした後、Xを押すとグローバルX軸に沿って移動します。もう一度Xを押すと、オブジェクトのローカルX軸に沿って移動します。</p>
+                <p id="desc-scale-jp" class="adv-desc" style="display:none;">ボーンやオブジェクトをX、Y、Z軸に沿ってスケール（拡大・縮小）できる、非常に便利なBlenderのホットキーショートカットも実装しました。基本的な原理として、例えばSを押してスケール（Blenderの操作）する状態にした後、Xを押すとグローバルX軸に沿ってスケールします。もう一度Xを押すと、オブジェクトのローカルX軸に沿ってスケールします。</p>
+                <p><i>言葉で説明するのは難しいので、動画を見て、押されている間の左下のショートカット表示（ショーキャスター）に注目してください。</i></p>
+                <p><i>ご注意：動画はすべての機能をカバーしているわけではなく、有用だと思われる機能のみを録画しています。</i></p>
+                
+                <div class="video-tabs">
+                    <button class="tab-btn active" data-video-src="assets/AdvNavRot1.mp4" data-ts-target="ts-rot-jp">回転 (Rotate)</button>
+                    <button class="tab-btn" data-video-src="assets/AdvNavMove1.mp4" data-ts-target="ts-move-jp">移動 (Move)</button>
+                    <button class="tab-btn" data-video-src="assets/AdvNavScale1.mp4" data-ts-target="ts-scale-jp">スケール (Scale)</button>
+                </div>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start;">
+                    <div class="video-container" style="flex: 0 0 65%; margin: 0;">
+                        <video src="assets/AdvNavRot1.mp4" controls loop muted playsinline></video>
+                    </div>
+
+                    <ul class="interactive-timestamps" id="ts-rot-jp" style="flex: 1; margin-top: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li data-time="2"><strong>X軸に沿って回転:</strong> 最初にRを押してから、Xを押します</li>
+                        <li data-time="14"><strong>Y軸（グローバル）に沿って回転:</strong> 最初にRを押してから、Yを押します</li>
+                        <li data-time="36"><strong>Y軸（ローカル）に沿って回転:</strong> 最初にRを押してから、Y、Yと押します</li>
+                        <li data-time="18"><strong>Z軸に沿って回転:</strong> 最初にRを押してから、Zを押します</li>
+                    </ul>
+
+                    <ul class="interactive-timestamps" id="ts-move-jp" style="flex: 1; margin-top: 0; display: none; flex-direction: column; gap: 10px;">
+                        <li data-time="33"><strong>X軸（グローバル）に沿って移動:</strong> 最初にGを押してから、X、Xと押します</li>
+                        <li data-time="0"><strong>X軸（ローカル）に沿って移動:</strong> 最初にGを押してから、Xを押します</li>
+                        <li data-time="43"><strong>Y軸（グローバル）に沿って移動:</strong> 最初にGを押してから、Y、Yと押します</li>
+                        <li data-time="3"><strong>Y軸（ローカル）に沿って移動:</strong> 最初にGを押してから、Yを押します</li>
+                        <li data-time="12"><strong>Z軸（グローバル）に沿って移動:</strong> 最初にGを押してから、Z、Zと押します</li>
+                        <li data-time="49"><strong>Z軸（ローカル）に沿って移動:</strong> 最初にGを押してから、Zを押します</li>
+                    </ul>
+
+                    <ul class="interactive-timestamps" id="ts-scale-jp" style="flex: 1; margin-top: 0; display: none; flex-direction: column; gap: 10px;">
+                        <li data-time="0"><strong>X軸（グローバル）に沿ってスケール:</strong> 最初にSを押してから、Xを押します</li>
+                        <li data-time="13"><strong>Y軸（グローバル）に沿ってスケール:</strong> 最初にSを押してから、Yを押します</li>
+                        <li data-time="24"><strong>Z軸（グローバル）に沿ってスケール:</strong> 最初にSを押してから、Zを押します</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="pie-menu-jp" class="panel">
+                <h3>1e. レンダリングモードの素早い切り替え (Quickly swap rendering modes)</h3>
+                <p>レンダリングモードを選択するためのBlenderのパイメニューも実装しました。Zキーを押し続け、マウスを希望のレンダリングモードに動かすだけで、ボーンがよりはっきりと見えます。</p>
+                <div class="video-container" style="max-width: 80%;">
+                    <video src="assets/NavZkey1.mp4" controls loop muted playsinline></video>
                 </div>
             </section>
 
@@ -952,6 +1196,22 @@
                 </ul>
             </section>
 
+            <section id="tool-showcase-jp" class="panel">
+                <h2><span class="step-icon">5</span> ツール紹介 (Tool Showcase)</h2>
+                <p>以下のビデオは、この新しいツールを使用して新しい「ポーズ」をどれだけ速く実現できるかを示すために録画しました。わずか3分で、このドキュメントで説明したツールのリストを使用して、ホームランダーのシーンをフィーチャーした新しいポーズを完成させることができました。このドキュメントがお役に立てば幸いです。ツールの購入をご検討ください。</p>
+                
+                <div style="margin-bottom: 25px;">
+                    <a href="#" class="btn-link" style="padding: 12px 28px; font-size: 1.2rem; background: rgba(255, 0, 85, 0.2); border-color: var(--neon-pink); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);">BOOTHで購入</a>
+                </div>
+
+                <div class="video-container" style="position: relative; padding-bottom: 62.5%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px;">
+                    <iframe src="https://www.youtube-nocookie.com/embed/3DVMLt2VeAU?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0" 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+            </section>
+
         </div>
 
     </main>
@@ -1012,7 +1272,8 @@
             sections.forEach(section => {
                 if (section.offsetParent === null) return; // Skip hidden elements
                 const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 150) {
+                // Trigger when the section crosses the upper third of the screen
+                if (scrollY + (window.innerHeight / 3) >= sectionTop) {
                     current = section.getAttribute('id').replace('-jp', '');
                 }
             });
@@ -1110,6 +1371,15 @@
             }
         };
 
+        // Dynamically set exact aspect-ratio to prevent 1-frame snapping on video source swap
+        document.querySelectorAll('video').forEach(video => {
+            video.addEventListener('loadedmetadata', function() {
+                if (this.videoWidth && this.videoHeight) {
+                    this.style.aspectRatio = this.videoWidth + ' / ' + this.videoHeight;
+                }
+            });
+        });
+
         // Interactive Video Timestamps
         document.querySelectorAll('.interactive-timestamps li').forEach(li => {
             li.addEventListener('mouseenter', function() {
@@ -1150,10 +1420,290 @@
                 li.style.opacity = '0.4';
                 li.style.cursor = 'default';
             } else {
-                li.style.cursor = 'crosshair';
+                li.style.cursor = 'pointer';
             }
         });
+
+        // Interactive Video Swapping
+        document.querySelectorAll('.interactive-videos li').forEach(li => {
+            li.addEventListener('mouseenter', function() {
+                if (!this.hasAttribute('data-video-src') || this.getAttribute('data-video-src') === "") return;
+                const src = this.getAttribute('data-video-src');
+                const panel = this.closest('.panel');
+                if (panel) {
+                    const videoContainer = panel.querySelector('.video-container');
+                    const video = panel.querySelector('video');
+                    if (video) {
+                        // Swap source if different
+                        if (!video.src.endsWith(src)) {
+                            // Set explicit aspect-ratio before swapping to prevent snapping
+                            if (video.videoWidth && video.videoHeight) {
+                                video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+                            }
+                            video.src = src;
+                            video.play().catch(e=>e);
+                        }
+
+                        this.style.color = 'var(--accent-glow)';
+                        this.style.textShadow = '0 0 10px rgba(0, 255, 204, 0.5)';
+                        
+                        if (videoContainer) {
+                            videoContainer.style.boxShadow = '0 0 40px rgba(0, 240, 255, 0.6), inset 0 0 20px rgba(0, 240, 255, 0.2)';
+                            videoContainer.style.transform = 'scale(1.02)';
+                            videoContainer.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                        }
+                    }
+                }
+            });
+            li.addEventListener('mouseleave', function() {
+                this.style.color = '';
+                this.style.textShadow = '';
+                const panel = this.closest('.panel');
+                if (panel) {
+                    const videoContainer = panel.querySelector('.video-container');
+                    if (videoContainer) {
+                        videoContainer.style.boxShadow = '';
+                        videoContainer.style.transform = '';
+                    }
+                }
+            });
+            
+            // Initial style check
+            if (!li.hasAttribute('data-video-src') || li.getAttribute('data-video-src') === "") {
+                li.style.opacity = '0.4';
+                li.style.cursor = 'default';
+            } else {
+                li.style.cursor = 'pointer';
+            }
+        });
+
+        // Tab button video swapping
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parent = this.closest('.panel');
+                const video = parent.querySelector('video');
+                const newSrc = this.getAttribute('data-video-src');
+                const targetTs = this.getAttribute('data-ts-target');
+                
+                if (video && newSrc) {
+                    const currentSrc = video.getAttribute('src');
+                    if (currentSrc !== newSrc) {
+                        // Update active state
+                        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+
+                        // Set explicit aspect-ratio before swapping to prevent snapping
+                        if (video.videoWidth && video.videoHeight) {
+                            video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+                        }
+                        video.src = newSrc;
+                        video.play().catch(e => console.log("Autoplay prevented:", e));
+                        
+                        // Toggle timestamp lists and description text
+                        if (targetTs) {
+                            parent.querySelectorAll('.interactive-timestamps').forEach(ts => {
+                                if (ts.id === targetTs) {
+                                    ts.style.display = 'flex';
+                                } else {
+                                    ts.style.display = 'none';
+                                }
+                            });
+                            
+                            const descTargetId = targetTs.replace('ts-', 'desc-');
+                            parent.querySelectorAll('.adv-desc').forEach(desc => {
+                                if (desc.id === descTargetId) {
+                                    desc.style.display = 'block';
+                                } else {
+                                    desc.style.display = 'none';
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
     </script>
-    <!-- DEV PANEL REMOVED FOR PRODUCTION -->
+    <!-- DEV PANEL FOR TIMESTAMPS -->
+    <div id="dev-panel" style="display: none; position: fixed; right: 20px; top: 20px; width: 300px; background: rgba(10, 10, 15, 0.9); border: 1px solid var(--accent); border-radius: 10px; padding: 15px; z-index: 9999; backdrop-filter: blur(10px); color: white; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-top: 0; color: var(--accent); font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Timestamp Editor</h3>
+        <div id="dev-panel-content"></div>
+        <button id="dev-panel-copy" style="width: 100%; margin-top: 15px; background: var(--accent); color: black; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">Copy Config for Anya</button>
+    </div>
+    <script>
+        // Build Dev Panel
+        const devPanelContent = document.getElementById('dev-panel-content');
+        const allTimestamps = document.querySelectorAll('.interactive-timestamps li');
+        
+        // Add Sync Toggle
+        const syncWrapper = document.createElement('div');
+        syncWrapper.style.marginBottom = '15px';
+        syncWrapper.style.paddingBottom = '10px';
+        syncWrapper.style.borderBottom = '1px solid #333';
+        syncWrapper.style.display = 'flex';
+        syncWrapper.style.alignItems = 'center';
+        
+        const syncCheckbox = document.createElement('input');
+        syncCheckbox.type = 'checkbox';
+        syncCheckbox.id = 'sync-jp-en';
+        syncCheckbox.checked = true;
+        syncCheckbox.style.marginRight = '8px';
+        
+        const syncLabel = document.createElement('label');
+        syncLabel.htmlFor = 'sync-jp-en';
+        syncLabel.innerText = 'Sync JP timestamps with EN';
+        syncLabel.style.fontSize = '12px';
+        syncLabel.style.color = '#aaa';
+        syncLabel.style.cursor = 'pointer';
+        
+        syncWrapper.appendChild(syncCheckbox);
+        syncWrapper.appendChild(syncLabel);
+        devPanelContent.appendChild(syncWrapper);
+        
+        // Build grouped inputs
+        const panelGroups = {};
+        const inputElements = []; // Store references to sync later
+        
+        allTimestamps.forEach((li, index) => {
+            const textLabel = li.innerText.split(':')[0].substring(0, 20);
+            const panel = li.closest('.panel');
+            const parentId = panel.id;
+            
+            if (!panelGroups[parentId]) {
+                const groupContainer = document.createElement('div');
+                groupContainer.className = 'dev-panel-group';
+                groupContainer.id = 'dev-group-' + parentId;
+                groupContainer.style.display = 'none'; // Hidden by default
+                
+                const sectionHeader = document.createElement('div');
+                sectionHeader.innerText = parentId;
+                sectionHeader.style.color = '#888';
+                sectionHeader.style.fontSize = '10px';
+                sectionHeader.style.marginTop = '10px';
+                sectionHeader.style.marginBottom = '5px';
+                sectionHeader.style.textTransform = 'uppercase';
+                
+                groupContainer.appendChild(sectionHeader);
+                devPanelContent.appendChild(groupContainer);
+                panelGroups[parentId] = groupContainer;
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '10px';
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'space-between';
+            wrapper.style.alignItems = 'center';
+            
+            const label = document.createElement('span');
+            label.innerText = textLabel;
+            label.style.fontSize = '12px';
+            label.style.opacity = '0.8';
+            label.style.whiteSpace = 'nowrap';
+            label.style.overflow = 'hidden';
+            label.style.textOverflow = 'ellipsis';
+            label.style.maxWidth = '180px';
+            
+            const input = document.createElement('input');
+            input.type = 'text'; // Changed to text to allow typing 'ignore'
+            input.value = li.getAttribute('data-time') || '';
+            input.style.width = '60px';
+            input.style.background = '#222';
+            input.style.border = '1px solid #444';
+            input.style.color = 'var(--accent)';
+            input.style.borderRadius = '3px';
+            input.style.padding = '3px';
+            
+            // Store reference for syncing
+            const isJp = parentId.endsWith('-jp');
+            const baseId = isJp ? parentId.replace('-jp', '') : parentId;
+            const elementData = { li, input, isJp, baseId, indexInList: -1 };
+            inputElements.push(elementData);
+            
+            // We need to know which index this is within its panel to sync correctly
+            elementData.indexInList = Array.from(panel.querySelectorAll('.interactive-timestamps li')).indexOf(li);
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value.trim().toLowerCase();
+                
+                if (val === 'ignore' || val === '') {
+                    li.removeAttribute('data-time');
+                    li.style.opacity = '0.4';
+                    li.style.cursor = 'default';
+                } else {
+                    li.setAttribute('data-time', val);
+                    li.style.opacity = '1';
+                    li.style.cursor = 'crosshair';
+                }
+                
+                // Seek video
+                const parsedVal = parseFloat(val);
+                if (panel && !isNaN(parsedVal)) {
+                    const video = panel.querySelector('video');
+                    if (video) video.currentTime = parsedVal;
+                }
+                
+                // Sync logic
+                if (syncCheckbox.checked && !isJp) {
+                    // Find the corresponding JP input
+                    const jpSibling = inputElements.find(el => el.isJp && el.baseId === baseId && el.indexInList === elementData.indexInList);
+                    if (jpSibling) {
+                        jpSibling.input.value = e.target.value; // Use original exact input text
+                        if (val === 'ignore' || val === '') {
+                            jpSibling.li.removeAttribute('data-time');
+                            jpSibling.li.style.opacity = '0.4';
+                            jpSibling.li.cursor = 'default';
+                        } else {
+                            jpSibling.li.setAttribute('data-time', val);
+                            jpSibling.li.style.opacity = '1';
+                            jpSibling.li.cursor = 'crosshair';
+                        }
+                    }
+                }
+            });
+            
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            panelGroups[parentId].appendChild(wrapper);
+        });
+
+        // Intersection Observer to show/hide dev panel groups based on scroll
+        const panelObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const devGroupId = 'dev-group-' + entry.target.id;
+                const groupEl = document.getElementById(devGroupId);
+                if (groupEl) {
+                    if (entry.isIntersecting) {
+                        groupEl.style.display = 'block';
+                    } else {
+                        groupEl.style.display = 'none';
+                    }
+                }
+                
+                // Highlight the sidebar link for the active panel
+                if (entry.isIntersecting) {
+                    const baseId = entry.target.id.replace('-jp', '');
+                    const activeLink = document.querySelector(`.nav-links a[href="#${baseId}"]`);
+                    if (activeLink) {
+                        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        }, { threshold: 0.2 });
+        
+        document.querySelectorAll('.panel').forEach(panel => {
+            panelObserver.observe(panel);
+        });
+
+        document.getElementById('dev-panel-copy').addEventListener('click', () => {
+            let config = {};
+            allTimestamps.forEach((li) => {
+                const id = li.closest('.panel').id;
+                if (!config[id]) config[id] = {};
+                config[id][li.innerText.split(':')[0]] = li.getAttribute('data-time');
+            });
+            navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+            alert('Copied to clipboard! Just paste it to Anya.');
+        });
+    </script>
 </body>
 </html>
