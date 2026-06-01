@@ -1254,8 +1254,22 @@
     <script>
         // Language Switcher Logic
         function switchLang(lang) {
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            // Identify currently active section before switching
+            let activeHash = '';
+            const currentNav = document.querySelector('.nav-links[style*="display: block"], .nav-links:not([style*="display: none"])');
+            if (currentNav) {
+                const activeLink = currentNav.querySelector('a.active');
+                if (activeLink) {
+                    activeHash = activeLink.getAttribute('href');
+                }
+            }
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(lang)) {
+                    btn.classList.add('active');
+                }
+            });
 
             document.querySelectorAll('.content-block').forEach(block => block.classList.remove('active'));
             document.getElementById('content-' + lang).classList.add('active');
@@ -1265,6 +1279,19 @@
             const targetNav = document.getElementById('nav-' + lang);
             if (targetNav) targetNav.style.display = 'block';
             
+            // Scroll to the equivalent section in the new language
+            if (activeHash) {
+                const targetId = lang === 'jp' ? activeHash.substring(1) + '-jp' : activeHash.substring(1);
+                const targetEl = document.getElementById(targetId);
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'auto' });
+                    
+                    const expectedHash = activeHash + (lang === 'jp' ? '/jp' : '/en');
+                    lastKnownScrollHash = expectedHash;
+                    history.replaceState(null, null, expectedHash);
+                }
+            }
+
             // Re-trigger scroll event to update active links for the new language sidebar
             window.dispatchEvent(new Event('scroll'));
         }
@@ -1285,7 +1312,7 @@
                     
                     if (targetEl) {
                         targetEl.scrollIntoView({ behavior: 'smooth' });
-                        history.pushState(null, null, hash);
+                        history.pushState(null, null, hash + (isJp ? '/jp' : '/en'));
                     }
                 }
             });
@@ -1302,6 +1329,7 @@
             }
         });
 
+        let lastKnownScrollHash = '';
         window.addEventListener('scroll', () => {
             let current = '';
             sections.forEach(section => {
@@ -1324,6 +1352,14 @@
                     link.classList.remove('active');
                     if (link.getAttribute('href') === `#${current}`) {
                         link.classList.add('active');
+                        
+                        // Update URL silently
+                        const isJp = document.getElementById('content-jp').classList.contains('active');
+                        const expectedHash = `#${current}` + (isJp ? '/jp' : '/en');
+                        if (lastKnownScrollHash !== expectedHash) {
+                            lastKnownScrollHash = expectedHash;
+                            history.replaceState(null, null, expectedHash);
+                        }
                         
                         // Add glowing trail backwards to all previous sub-links up to the header
                         if (link.classList.contains('sub-link')) {
@@ -1866,6 +1902,40 @@
                 this.style.cursor = 'default';
                 this.style.boxShadow = '0 0 15px rgba(0, 240, 255, 0.4)';
             }, 100);
+        });
+
+        // Parse incoming language-specific hashes
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash;
+            if (hash) {
+                let targetLang = 'en';
+                let baseHash = hash;
+                
+                if (hash.endsWith('/jp')) {
+                    targetLang = 'jp';
+                    baseHash = hash.replace('/jp', '');
+                } else if (hash.endsWith('/en')) {
+                    targetLang = 'en';
+                    baseHash = hash.replace('/en', '');
+                }
+
+                if (targetLang === 'jp') {
+                    switchLang('jp');
+                }
+
+                if (baseHash) {
+                    setTimeout(() => {
+                        const isJp = targetLang === 'jp';
+                        const targetId = isJp ? baseHash.substring(1) + '-jp' : baseHash.substring(1);
+                        const targetEl = document.getElementById(targetId);
+                        if (targetEl) {
+                            targetEl.scrollIntoView({ behavior: 'smooth' });
+                            // Force trigger scroll once to ensure URL isn't overwritten immediately
+                            window.dispatchEvent(new Event('scroll'));
+                        }
+                    }, 150);
+                }
+            }
         });
     </script>
 </body>
